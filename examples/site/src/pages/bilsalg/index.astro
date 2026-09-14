@@ -1,0 +1,71 @@
+---
+/**
+ * The list page. Thin on purpose: the loader, caching, criteria and the
+ * components are the package's; the layout, headings and the card are ours.
+ */
+export const prerender = false;
+
+import { getLiveCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import BilKort from "../../components/biler/BilKort.astro";
+import { BILBOOST } from "../../config/bilboost.mjs";
+import { getConfig } from "bilboost-astro";
+import { applyCache, markUnavailable } from "bilboost-astro/cache";
+import { applyCriteria, facets, parseCriteria } from "bilboost-astro/criteria";
+import { mergeLabels } from "bilboost-astro/labels";
+import { getLastDealer } from "bilboost-astro/loader";
+import BbEmpty from "bilboost-astro/components/BbEmpty.astro";
+import BbFilters from "bilboost-astro/components/BbFilters.astro";
+import BbJsonLd from "bilboost-astro/components/BbJsonLd.astro";
+import BbPagination from "bilboost-astro/components/BbPagination.astro";
+import BbResultCount from "bilboost-astro/components/BbResultCount.astro";
+import BbUnavailable from "bilboost-astro/components/BbUnavailable.astro";
+import BbVehicleList from "bilboost-astro/components/BbVehicleList.astro";
+import "../../styles/bilboost.css";
+
+const cfg = await getConfig();
+const labels = mergeLabels(BILBOOST.labels);
+const criteria = parseCriteria(Astro.url.searchParams);
+const { entries, error, cacheHint } = await getLiveCollection("biler");
+
+if (error || !entries) {
+  markUnavailable(Astro);
+}
+const vehicles = (entries ?? []).map((e) => e.data);
+const page = applyCriteria(vehicles, criteria, BILBOOST.pageSize);
+if (!error) applyCache(Astro, "list", cfg, cacheHint);
+const canonical = `${cfg.siteUrl}${cfg.basePath}/`;
+---
+
+<Layout title={labels.list.heading} canonical={canonical}>
+  <section class="section" data-section="bilsalg">
+    <div class="container-site">
+      <h1>{labels.list.heading}</h1>
+
+      {error ? (
+        <BbUnavailable variant="unavailable" basePath={cfg.basePath} phone={BILBOOST.phone} />
+      ) : (
+        <div data-bb="listing" class="bilsalg">
+          <BbFilters
+            criteria={criteria}
+            facets={facets(vehicles, criteria)}
+            basePath={cfg.basePath}
+            show={BILBOOST.filters}
+            labels={labels.filters}
+            class="bilsalg__filtre"
+            fieldClass={BILBOOST.classes.field}
+            inputClass={BILBOOST.classes.input}
+            buttonClass={BILBOOST.classes.button}
+          />
+          <BbResultCount total={page.total} one={labels.list.count_one} many={labels.list.count_many} class="bilsalg__antal" />
+          <BbVehicleList vehicles={page.items} all={vehicles} basePath={cfg.basePath} pageSize={BILBOOST.pageSize} moreClass={BILBOOST.classes.secondaryButton} listClass="bilsalg__liste">
+            <fragment slot="card">{(vehicle, ctx) => <BilKort vehicle={vehicle} ctx={ctx} />}</fragment>
+          </BbVehicleList>
+          <BbEmpty basePath={cfg.basePath} hidden={page.total > 0} message={labels.list.empty} resetLabel={labels.list.empty_reset} />
+          <BbPagination page={page.page} pages={page.pages} criteria={criteria} basePath={cfg.basePath} linkClass={BILBOOST.classes.secondaryButton} />
+          <BbJsonLd vehicles={page.items} siteUrl={cfg.siteUrl} basePath={cfg.basePath} dealer={getLastDealer()} listName={labels.list.heading} />
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,28 @@
+---
+/** Facts as a definition list; empty values are left out. */
+import type { PublicVehicle } from "../src/contract.ts";
+import { vehicleFacts } from "../src/format.ts";
+import { LABELS } from "../src/labels.da.ts";
+
+interface Props {
+  vehicle: PublicVehicle;
+  heading?: string | null;
+  class?: string;
+}
+const { vehicle, heading = LABELS.detail.facts, class: className } = Astro.props;
+const rows = vehicleFacts(vehicle);
+---
+
+{rows.length > 0 && (
+  <section data-bb="facts" class={className}>
+    {heading && <h2 data-bb="facts-heading">{heading}</h2>}
+    <dl data-bb="facts-list">
+      {rows.map((r) => (
+        <div data-bb="fact">
+          <dt>{r.label}</dt>
+          <dd>{r.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+)}

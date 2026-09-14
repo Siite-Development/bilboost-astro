@@ -1,0 +1,20 @@
+/* Minimal tokens so the example renders; a real site has its own tokens.css. */
+:root {
+  --brand: #d8342c; --brand-deep: #9a1f19; --ink: #1a1a1a; --ink-muted: #5b5b63; --danger: #b3261e;
+  --surface-card: #ffffff; --surface-muted: #f4f4f5; --line: #e5e5e8; --line-strong: #c9c9d0;
+  --radius: 14px; --radius-pill: 999px; --shadow-2: 0 10px 30px rgb(0 0 0 / 8%);
+  --space-1: 0.5rem; --space-2: 1rem; --space-3: 1.5rem; --space-4: 2rem; --space-6: 4rem;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1.05rem; --text-lg: 1.25rem; --text-xl: 1.75rem;
+  --motion-duration: 180ms; --motion-ease: cubic-bezier(.2,.7,.2,1);
+}
+body { margin: 0; font-family: system-ui, sans-serif; color: var(--ink); }
+.container-site { max-width: 1232px; margin: 0 auto; padding: 0 1rem; }
+.section { padding: var(--space-4) 0; }
+.measure { max-width: 72ch; }
+.btn { display: inline-flex; align-items: center; padding: 0.7rem 1.2rem; border-radius: var(--radius-pill); border: 1px solid var(--brand); font-weight: 700; cursor: pointer; }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-secondary { background: #fff; color: var(--brand-deep); }
+.input { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--line-strong); border-radius: calc(var(--radius) / 2); font: inherit; }
+.field { display: grid; gap: 0.25rem; }
+.site-header, .site-footer { padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.site-footer { border-top: 1px solid var(--line); border-bottom: 0; }

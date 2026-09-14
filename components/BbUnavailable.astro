@@ -1,0 +1,39 @@
+---
+/**
+ * The three "no car here" states. `sold` and `not_found` are cached under
+ * the car's tag (a later create purges them); `unavailable` is a 503 the
+ * page marks with `markUnavailable` so it is never stored.
+ */
+import type { SoldStub } from "../src/contract.ts";
+import { vehicleTitle } from "../src/format.ts";
+import { LABELS, t } from "../src/labels.da.ts";
+import { listPath } from "../src/slug.ts";
+
+interface Props {
+  variant: "sold" | "not_found" | "unavailable";
+  basePath: string;
+  stub?: SoldStub;
+  phone?: string | null;
+  class?: string;
+  linkClass?: string;
+}
+const { variant, basePath, stub, phone = null, class: className, linkClass } = Astro.props;
+const heading =
+  variant === "sold" ? LABELS.detail.sold_heading : variant === "not_found" ? LABELS.detail.not_found_heading : LABELS.list.unavailable_heading;
+const body =
+  variant === "sold"
+    ? t(LABELS.detail.sold_body, { title: stub ? vehicleTitle({ make: stub.make, model: stub.model, variant: stub.variant }) : "Bilen" })
+    : variant === "not_found"
+      ? LABELS.detail.not_found_body
+      : phone
+        ? t(LABELS.list.unavailable_body, { phone })
+        : LABELS.list.unavailable_body_nophone;
+---
+
+<section data-bb="unavailable" data-bb-variant={variant} class={className}>
+  <h1 data-bb="unavailable-heading">{heading}</h1>
+  <p data-bb="unavailable-body">{body}</p>
+  {variant !== "unavailable" && (
+    <a href={listPath(basePath)} data-bb="unavailable-link" class={linkClass}>{LABELS.detail.back}</a>
+  )}
+</section>

@@ -1,0 +1,19 @@
+---
+/** Shown when no car matches; hidden by the filter script while there are matches. */
+import { LABELS } from "../src/labels.da.ts";
+import { listPath } from "../src/slug.ts";
+
+interface Props {
+  basePath: string;
+  hidden?: boolean;
+  message?: string;
+  resetLabel?: string;
+  class?: string;
+}
+const { basePath, hidden = false, message = LABELS.list.empty, resetLabel = LABELS.list.empty_reset, class: className } = Astro.props;
+---
+
+<div data-bb="empty" hidden={hidden} class={className}>
+  <p>{message}</p>
+  <a href={listPath(basePath)}>{resetLabel}</a>
+</div>

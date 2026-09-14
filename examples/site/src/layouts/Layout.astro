@@ -1,0 +1,20 @@
+---
+/** Stand-in for a Siite site's own layout: head, header, footer. */
+import "../styles/tokens.css";
+interface Props { title: string; canonical?: string }
+const { title, canonical } = Astro.props;
+---
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | Demo Biler</title>
+    {canonical && <link rel="canonical" href={canonical} />}
+  </head>
+  <body>
+    <header class="site-header"><div class="container-site"><a href="/">Demo Biler</a> · <a href="/bilsalg/">Bilsalg</a></div></header>
+    <main><slot /></main>
+    <footer class="site-footer"><div class="container-site"><p>© {new Date().getFullYear()} | Demo Biler</p></div></footer>
+  </body>
+</html>

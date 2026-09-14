@@ -1,0 +1,59 @@
+{
+  "name": "bilboost-astro",
+  "version": "0.1.0",
+  "private": false,
+  "description": "BilBoost cars on a dealer's Astro site: live loader, edge cache, signed revalidate, inquiry form. Behaviour lives here; the site owns the look.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "repository": "github:Siite-Development/bilboost-astro",
+  "files": [
+    "src",
+    "components",
+    "styles",
+    "bin",
+    "fixtures",
+    "README.md",
+    "HOOKS.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./integration": "./src/integration.ts",
+    "./loader": "./src/loader.ts",
+    "./cache": "./src/cache.ts",
+    "./criteria": "./src/criteria.ts",
+    "./format": "./src/format.ts",
+    "./jsonld": "./src/jsonld.ts",
+    "./slug": "./src/slug.ts",
+    "./tags": "./src/tags.ts",
+    "./contract": "./src/contract.ts",
+    "./labels": "./src/labels.da.ts",
+    "./middleware": "./src/middleware.ts",
+    "./routes/revalidate": "./src/routes/revalidate.ts",
+    "./routes/health": "./src/routes/health.ts",
+    "./routes/sitemap": "./src/routes/sitemap.ts",
+    "./client/*": "./src/client/*.ts",
+    "./components/*": "./components/*",
+    "./styles/*": "./styles/*",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "bilboost-astro": "./bin/bilboost-astro.mjs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@astrojs/cloudflare": "^14.0.0",
+    "astro": "^7.2.0"
+  },
+  "devDependencies": {
+    "@astrojs/cloudflare": "14.3.1",
+    "@types/node": "^22.20.2",
+    "astro": "7.3.2",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  },
+  "types": "./src/index.ts"
+}

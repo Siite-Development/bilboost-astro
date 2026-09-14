@@ -1,0 +1,110 @@
+---
+/**
+ * The filter form: a plain GET form the server understands, upgraded by
+ * `client/filters.ts` into live filtering. Options come from `facets()`
+ * over the FULL list. Choose which filters to show with `show`.
+ */
+import type { Criteria, Facets } from "../src/criteria.ts";
+import { SORTS } from "../src/criteria.ts";
+import { LABELS, type Labels } from "../src/labels.da.ts";
+import { listPath } from "../src/slug.ts";
+
+type FilterKey = "maerke" | "model" | "braendstof" | "pris" | "aar" | "km" | "q" | "sort";
+
+interface Props {
+  criteria: Criteria;
+  facets: Facets;
+  basePath: string;
+  show?: FilterKey[];
+  labels?: Labels["filters"];
+  class?: string;
+  fieldClass?: string;
+  inputClass?: string;
+  buttonClass?: string;
+}
+const {
+  criteria: c,
+  facets: f,
+  basePath,
+  show = ["maerke", "model", "braendstof", "pris", "q", "sort"],
+  labels = LABELS.filters,
+  class: className,
+  fieldClass,
+  inputClass,
+  buttonClass,
+} = Astro.props;
+const on = (k: FilterKey) => show.includes(k);
+const id = (k: string) => `bb-f-${k}`;
+---
+
+<form data-bb="filters" method="get" action={listPath(basePath)} class={className} role="search" aria-label={labels.legend}>
+  {on("q") && (
+    <div data-bb="filter" data-bb-filter="q" class={fieldClass}>
+      <label for={id("q")}>{labels.search}</label>
+      <input id={id("q")} type="search" name="q" value={c.q ?? ""} placeholder={labels.search_placeholder} class={inputClass} autocomplete="off" />
+    </div>
+  )}
+  {on("maerke") && (
+    <div data-bb="filter" data-bb-filter="maerke" class={fieldClass}>
+      <label for={id("maerke")}>{labels.make}</label>
+      <select id={id("maerke")} name="maerke" class={inputClass}>
+        <option value="">{labels.any}</option>
+        {f.makes.map((m) => <option value={m.value} selected={c.maerke === m.value}>{m.value} ({m.count})</option>)}
+      </select>
+    </div>
+  )}
+  {on("model") && (
+    <div data-bb="filter" data-bb-filter="model" class={fieldClass}>
+      <label for={id("model")}>{labels.model}</label>
+      <select id={id("model")} name="model" class={inputClass}>
+        <option value="">{labels.any}</option>
+        {f.models.map((m) => <option value={m.value} selected={c.model === m.value}>{m.value} ({m.count})</option>)}
+      </select>
+    </div>
+  )}
+  {on("braendstof") && (
+    <div data-bb="filter" data-bb-filter="braendstof" class={fieldClass}>
+      <label for={id("braendstof")}>{labels.fuel}</label>
+      <select id={id("braendstof")} name="braendstof" class={inputClass}>
+        <option value="">{labels.any}</option>
+        {f.fuels.map((m) => <option value={m.value} selected={c.braendstof === m.value}>{m.value} ({m.count})</option>)}
+      </select>
+    </div>
+  )}
+  {on("pris") && (
+    <div data-bb="filter" data-bb-filter="pris" class={fieldClass}>
+      <label for={id("pris_min")}>{labels.price_min}</label>
+      <input id={id("pris_min")} type="number" name="pris_min" inputmode="numeric" min="0" step="1000" value={c.pris_min ?? ""} placeholder={f.price ? String(f.price.min) : ""} class={inputClass} />
+      <label for={id("pris_max")}>{labels.price_max}</label>
+      <input id={id("pris_max")} type="number" name="pris_max" inputmode="numeric" min="0" step="1000" value={c.pris_max ?? ""} placeholder={f.price ? String(f.price.max) : ""} class={inputClass} />
+    </div>
+  )}
+  {on("aar") && (
+    <div data-bb="filter" data-bb-filter="aar" class={fieldClass}>
+      <label for={id("aar_min")}>{labels.year_min}</label>
+      <input id={id("aar_min")} type="number" name="aar_min" inputmode="numeric" min={f.year?.min ?? 1990} max={f.year?.max ?? 2100} value={c.aar_min ?? ""} class={inputClass} />
+    </div>
+  )}
+  {on("km") && (
+    <div data-bb="filter" data-bb-filter="km" class={fieldClass}>
+      <label for={id("km_max")}>{labels.km_max}</label>
+      <input id={id("km_max")} type="number" name="km_max" inputmode="numeric" min="0" step="10000" value={c.km_max ?? ""} class={inputClass} />
+    </div>
+  )}
+  {on("sort") && (
+    <div data-bb="filter" data-bb-filter="sort" class={fieldClass}>
+      <label for={id("sort")}>{labels.sort}</label>
+      <select id={id("sort")} name="sort" class={inputClass}>
+        {SORTS.map((s) => <option value={s} selected={c.sort === s}>{labels[`sort_${s}` as keyof typeof labels]}</option>)}
+      </select>
+    </div>
+  )}
+  <div data-bb="filter-actions" class={fieldClass}>
+    <button type="submit" data-bb="filters-submit" class={buttonClass}>{labels.submit}</button>
+    <a href={listPath(basePath)} data-bb="filters-reset">{labels.reset}</a>
+  </div>
+</form>
+
+<script>
+  import "../src/client/filters.ts";
+</script>

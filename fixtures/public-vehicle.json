@@ -1,0 +1,49 @@
+{
+  "about": "One PublicVehicle exactly as BilBoost's read API returns it (contract v1). Pinned by convex/lib/publicVehicle.test.ts in BilBoost and test/contract.test.ts here.",
+  "vehicle": {
+    "id": "BB-12",
+    "slug": "bmw-320d-touring-aut-2019-bb-12",
+    "status": "paa_lager",
+    "make": "BMW",
+    "model": "320d",
+    "variant": "Touring Aut.",
+    "year": 2019,
+    "mileage": 88000,
+    "color": "Sort",
+    "fuel_type": "Diesel",
+    "price": 289900,
+    "delivery_cost": 4380,
+    "green_tax": 1200,
+    "description": "Velholdt bil med fuld servicehistorik.",
+    "equipment": ["Navigation", "Sædevarme"],
+    "images": [
+      {
+        "alt": "BMW 320d Touring Aut.",
+        "variants": [
+          { "width": 320, "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/320" },
+          { "width": 640, "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/640" },
+          { "width": 1024, "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/1024" }
+        ]
+      }
+    ],
+    "specs": {
+      "horsepower": 190,
+      "torque": 400,
+      "acceleration": 7.1,
+      "top_speed": 230,
+      "weight": 1650,
+      "payload": 500,
+      "length_cm": 471,
+      "width_cm": 183,
+      "height_cm": 144,
+      "trunk_liters": 500,
+      "battery_capacity": null,
+      "range_wltp": null,
+      "energy_consumption": null,
+      "ac_charging": null,
+      "dc_charging": null
+    },
+    "created_at": 1700000000000,
+    "updated_at": 1700000100000
+  }
+}

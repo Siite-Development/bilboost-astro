@@ -1,0 +1,33 @@
+---
+/**
+ * One responsive image from a BilBoost `PublicImage`: `srcset` over every
+ * variant, `width`/`height` from the fixed 4:3 frame so nothing jumps, lazy
+ * by default. The site styles `[data-bb="image"]`.
+ */
+import type { PublicImage } from "../src/contract.ts";
+import { imageAttrs, SIZES } from "../src/images.ts";
+
+interface Props {
+  image: PublicImage;
+  sizes?: string;
+  eager?: boolean;
+  preferredWidth?: number;
+  class?: string;
+}
+const { image, sizes = SIZES.card, eager = false, preferredWidth = 640, class: className } = Astro.props;
+const attrs = imageAttrs(image, sizes, preferredWidth);
+---
+
+<span data-bb="image" class={className}>
+  <img
+    src={attrs.src}
+    srcset={attrs.srcset}
+    sizes={attrs.sizes}
+    width={attrs.width}
+    height={attrs.height}
+    alt={attrs.alt}
+    loading={eager ? "eager" : "lazy"}
+    fetchpriority={eager ? "high" : "auto"}
+    decoding="async"
+  />
+</span>

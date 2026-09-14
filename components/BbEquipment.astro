@@ -1,0 +1,21 @@
+---
+/** The equipment list, as the dealer typed it. */
+import type { PublicVehicle } from "../src/contract.ts";
+import { LABELS } from "../src/labels.da.ts";
+
+interface Props {
+  vehicle: Pick<PublicVehicle, "equipment">;
+  heading?: string | null;
+  class?: string;
+}
+const { vehicle, heading = LABELS.detail.equipment, class: className } = Astro.props;
+---
+
+{vehicle.equipment.length > 0 && (
+  <section data-bb="equipment" class={className}>
+    {heading && <h2 data-bb="equipment-heading">{heading}</h2>}
+    <ul data-bb="equipment-list">
+      {vehicle.equipment.map((item) => <li>{item}</li>)}
+    </ul>
+  </section>
+)}

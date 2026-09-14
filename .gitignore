@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+*.log
+.DS_Store
+examples/site/node_modules/
+examples/site/dist/
+examples/site/.astro/
+examples/site/.wrangler/
+.dev.vars

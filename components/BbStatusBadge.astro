@@ -1,0 +1,17 @@
+---
+/** "Reserveret" on a reserved car; renders nothing otherwise. */
+import type { PublicVehicle } from "../src/contract.ts";
+import { statusBadge } from "../src/format.ts";
+
+interface Props {
+  vehicle: Pick<PublicVehicle, "status">;
+  label?: string;
+  class?: string;
+}
+const { vehicle, label, class: className } = Astro.props;
+const badge = statusBadge(vehicle);
+---
+
+{badge && (
+  <span data-bb="status" data-bb-status={badge.key} class={className}>{label ?? badge.label}</span>
+)}

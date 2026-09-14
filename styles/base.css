@@ -1,0 +1,111 @@
+/*
+ * bilboost-astro base — FUNCTIONAL CSS ONLY. No colours, no fonts, no
+ * spacing decisions: those belong to the site's own stylesheet, keyed on the
+ * [data-bb] hooks (see HOOKS.md). Everything here is what the behaviour
+ * needs to work at all: hidden steps, the rail's scroll-snap, the dialog's
+ * centring, the skeleton of the step form.
+ */
+
+[data-bb][hidden],
+[data-bb-step][hidden] {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------- rail */
+[data-bb="rail-viewport"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+[data-bb="rail-viewport"]::-webkit-scrollbar {
+  display: none;
+}
+.bb-rail--on [data-bb="rail-viewport"] > * {
+  display: flex;
+  width: max-content;
+}
+.bb-rail--on [data-bb="rail-viewport"] > * > * {
+  flex: 0 0 auto;
+  width: var(--bb-rail-card, min(78vw, 320px));
+  scroll-snap-align: start;
+}
+[data-bb="rail-nav"] {
+  display: none;
+}
+.bb-rail--on [data-bb="rail-nav"] {
+  display: flex;
+  flex-direction: row-reverse; /* arrows left: the sticky contact widget owns the right */
+  align-items: center;
+  gap: 1rem;
+}
+[data-bb="rail-track"] {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+[data-bb="rail-progress"] {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(var(--bb-rail-s, 0.25));
+  transform-origin: left center;
+}
+[data-bb="rail-prev"]:disabled,
+[data-bb="rail-next"]:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ------------------------------------------------------------- lightbox */
+dialog[data-bb="lightbox"] {
+  margin: auto;
+  width: fit-content;
+  max-width: min(90vw, 62rem);
+  max-height: 88dvh;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+}
+dialog[data-bb="lightbox"]::backdrop {
+  background: rgba(6, 16, 24, 0.9);
+}
+dialog[data-bb="lightbox"] img {
+  display: block;
+  max-width: 100%;
+  max-height: 72dvh;
+  width: auto;
+  height: auto;
+}
+button[data-bb="gallery-open"] {
+  cursor: zoom-in;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* ------------------------------------------------------------ inquiry */
+form[data-bb="inquiry"] [data-bb="inquiry-progress"][hidden],
+form[data-bb="inquiry"] [data-bb="inquiry-nojs"][hidden] {
+  display: none;
+}
+form[data-bb="inquiry"] [data-bb="inquiry-turnstile"]:empty {
+  display: none;
+}
+
+/* ------------------------------------------------------------- images */
+[data-bb="image"] img,
+[data-bb="card-image"] img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-bb="rail-progress"] {
+    transition: none;
+  }
+}

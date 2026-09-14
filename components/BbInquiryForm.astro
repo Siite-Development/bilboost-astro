@@ -1,0 +1,171 @@
+---
+/**
+ * "Skriv om denne bil" — three steps (topic, message, contact), posting
+ * straight to BilBoost's inquiry endpoint. Mechanics in
+ * `client/inquiry.ts`; the site styles the hooks. Without JavaScript the
+ * form is one page and cannot send (Turnstile needs a browser), which the
+ * `<noscript>` line says, with the dealer's phone number.
+ */
+import type { PublicVehicle } from "../src/contract.ts";
+import { INQUIRY_TOPICS } from "../src/contract.ts";
+import { LABELS, t } from "../src/labels.da.ts";
+
+interface Props {
+  vehicle: Pick<PublicVehicle, "id" | "make" | "model" | "variant">;
+  /** BilBoost base, e.g. `https://pastel-civet-419.eu-west-1.convex.site`. */
+  apiBase: string;
+  siteKey: string;
+  turnstileSiteKey?: string | null;
+  phone?: string | null;
+  labels?: typeof LABELS.inquiry;
+  class?: string;
+  fieldClass?: string;
+  inputClass?: string;
+  buttonClass?: string;
+  secondaryButtonClass?: string;
+}
+const {
+  vehicle,
+  apiBase,
+  siteKey,
+  turnstileSiteKey = null,
+  phone = null,
+  labels = LABELS.inquiry,
+  class: className,
+  fieldClass,
+  inputClass,
+  buttonClass,
+  secondaryButtonClass,
+} = Astro.props;
+
+const endpoint = `${apiBase.replace(/\/+$/, "")}/public/v1/sites/${siteKey}/inquiries`;
+const uid = `bb-inq-${vehicle.id.toLowerCase()}`;
+const steps = [
+  { key: "topic", title: labels.topic_title },
+  { key: "message", title: labels.message_title },
+  { key: "contact", title: labels.contact_title },
+];
+const clientLabels = {
+  required: labels.required,
+  phone_invalid: labels.phone_invalid,
+  email_invalid: labels.email_invalid,
+  contact_required: labels.contact_required,
+  step_of: labels.step_of,
+  submit: labels.submit,
+  sending: labels.sending,
+  error: phone ? t(labels.error, { phone }) : labels.error_nophone,
+  bot_failed: labels.bot_failed,
+};
+---
+
+<form
+  data-bb="inquiry"
+  data-bb-endpoint={endpoint}
+  data-bb-turnstile-key={turnstileSiteKey ?? ""}
+  data-bb-labels={JSON.stringify(clientLabels)}
+  method="post"
+  action={endpoint}
+  class={className}
+  novalidate
+>
+  <input type="hidden" name="submission_id" value="" />
+  <input type="hidden" name="vehicle_id" value={vehicle.id} />
+  <input type="hidden" name="turnstile_token" value="" />
+  <input type="hidden" name="page_url" value="" />
+  <!-- Honeypot: rendered but never shown; a bot fills it, a person cannot. -->
+  <div data-bb="inquiry-honeypot" aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+    <label for={`${uid}-website`}>Website</label>
+    <input id={`${uid}-website`} type="text" name="bb_website" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <header data-bb="inquiry-header">
+    <h2 data-bb="inquiry-heading">{labels.heading}</h2>
+    <p data-bb="inquiry-intro">{labels.intro}</p>
+    <ol data-bb="inquiry-progress" hidden aria-label={t(labels.step_of, { n: 1, m: steps.length })}>
+      {steps.map((s, i) => <li data-bb-step-marker={i} aria-current={i === 0 ? "step" : "false"}>{s.title}</li>)}
+    </ol>
+    <p data-bb="inquiry-step-line" hidden>
+      {t(labels.step_of, { n: "<span data-bb=\"inquiry-step-now\">1</span>", m: steps.length })}
+    </p>
+  </header>
+
+  <fieldset data-bb-step="topic" data-bb="inquiry-step">
+    <legend data-bb-step-title>{labels.topic_title}</legend>
+    <div data-bb-field data-bb="inquiry-field" class={fieldClass}>
+      {INQUIRY_TOPICS.map((topic, i) => (
+        <label data-bb="inquiry-topic">
+          <input type="radio" name="topic" value={topic} required={i === 0} />
+          <span>{labels[`topic_${topic}` as keyof typeof labels]}</span>
+        </label>
+      ))}
+      <p data-bb="field-error" role="alert" hidden></p>
+    </div>
+  </fieldset>
+
+  <fieldset data-bb-step="message" data-bb="inquiry-step">
+    <legend data-bb-step-title>{labels.message_title}</legend>
+    <div data-bb-field data-bb="inquiry-field" class={fieldClass}>
+      <label for={`${uid}-message`}>{labels.message}</label>
+      <textarea id={`${uid}-message`} name="message" rows="5" maxlength="2000" class={inputClass}></textarea>
+      <p data-bb="field-error" role="alert" hidden></p>
+    </div>
+    <div data-bb-field data-bb="inquiry-field" class={fieldClass}>
+      <label for={`${uid}-trade`}>{labels.trade_in}</label>
+      <input id={`${uid}-trade`} type="text" name="trade_in" maxlength="300" class={inputClass} />
+      <p data-bb="field-error" role="alert" hidden></p>
+    </div>
+  </fieldset>
+
+  <fieldset data-bb-step="contact" data-bb="inquiry-step">
+    <legend data-bb-step-title>{labels.contact_title}</legend>
+    <div data-bb-field data-bb="inquiry-field" class={fieldClass}>
+      <label for={`${uid}-name`}>{labels.name}</label>
+      <input id={`${uid}-name`} type="text" name="name" required autocomplete="name" maxlength="100" class={inputClass} />
+      <p data-bb="field-error" role="alert" hidden></p>
+    </div>
+    <div data-bb-field data-bb="inquiry-field" class={fieldClass}>
+      <label for={`${uid}-phone`}>{labels.phone}</label>
+      <input id={`${uid}-phone`} type="tel" name="phone" autocomplete="tel" inputmode="tel" maxlength="40" class={inputClass} />
+      <p data-bb="field-error" role="alert" hidden></p>
+    </div>
+    <div data-bb-field data-bb="inquiry-field" class={fieldClass}>
+      <label for={`${uid}-email`}>{labels.email}</label>
+      <input id={`${uid}-email`} type="email" name="email" autocomplete="email" maxlength="255" class={inputClass} />
+      <p data-bb="field-error" role="alert" hidden></p>
+      <p data-bb="inquiry-hint">{labels.contact_hint}</p>
+    </div>
+    <div data-bb="inquiry-turnstile"></div>
+    <p data-bb="inquiry-privacy">{labels.privacy}</p>
+  </fieldset>
+
+  <p data-bb="inquiry-live" class="bb-sr-only" aria-live="polite"></p>
+  <p data-bb="inquiry-error" role="alert" tabindex="-1" hidden></p>
+
+  <div data-bb="inquiry-actions">
+    <button type="button" data-bb="inquiry-back" class={secondaryButtonClass} hidden>{labels.back}</button>
+    <button type="button" data-bb="inquiry-next" class={buttonClass} hidden>{labels.next}</button>
+    <button type="submit" data-bb="inquiry-submit" class={buttonClass}>{labels.submit}</button>
+  </div>
+
+  <noscript>
+    <p data-bb="inquiry-nojs">{phone ? t(labels.nojs, { phone }) : labels.error_nophone}</p>
+  </noscript>
+</form>
+
+<style is:global>
+  .bb-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<script>
+  import "../src/client/inquiry.ts";
+</script>

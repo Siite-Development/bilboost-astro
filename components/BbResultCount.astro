@@ -1,0 +1,16 @@
+---
+/** "21 biler" — kept live by the filter script through its data attributes. */
+import { LABELS, t } from "../src/labels.da.ts";
+
+interface Props {
+  total: number;
+  one?: string;
+  many?: string;
+  class?: string;
+}
+const { total, one = LABELS.list.count_one, many = LABELS.list.count_many, class: className } = Astro.props;
+---
+
+<p data-bb="count" data-one={one} data-many={many} class={className} aria-live="polite">
+  {total === 1 ? one : t(many, { n: total })}
+</p>

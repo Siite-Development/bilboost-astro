@@ -1,0 +1,50 @@
+{
+  "about": "Shared by convex/lib/siteSignature.test.ts (BilBoost) and bilboost-astro. Signature = HMAC-SHA256(secret, `${t}.${body}`) hex; header `t=<t>,v1=<hex>`; tolerance 300 s.",
+  "cases": [
+    {
+      "name": "cars push, fresh",
+      "secret": "bbw_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "body": "{\"v\":1,\"type\":\"vehicles.changed\",\"site_key\":\"monzes-auto\",\"seq\":42,\"sent_at\":1757854800123,\"scope\":\"cars\",\"vehicle_ids\":[\"BB-12\",\"BB-31\"],\"dry_run\":false}",
+      "t": 1757854800,
+      "now": 1757854810,
+      "header": "t=1757854800,v1=2086e1850f4b1d4c6b74dc61a2c6f69e4b2530bcf201cc31d15fda65e07be383",
+      "valid": true
+    },
+    {
+      "name": "dry run, scope all",
+      "secret": "bbw_ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "body": "{\"v\":1,\"type\":\"vehicles.changed\",\"site_key\":\"demo-biler\",\"seq\":1,\"sent_at\":1757854800123,\"scope\":\"all\",\"vehicle_ids\":[],\"dry_run\":true}",
+      "t": 1757854800,
+      "now": 1757854800,
+      "header": "t=1757854800,v1=d545485358b100af9265f23a52d0db5f5d01ec24a36a163230f1a0f252b33251",
+      "valid": true
+    },
+    {
+      "name": "at the tolerance edge (300 s)",
+      "secret": "bbw_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "body": "{\"v\":1,\"type\":\"vehicles.changed\",\"site_key\":\"monzes-auto\",\"seq\":42,\"sent_at\":1757854800123,\"scope\":\"cars\",\"vehicle_ids\":[\"BB-12\",\"BB-31\"],\"dry_run\":false}",
+      "t": 1757854800,
+      "now": 1757855100,
+      "header": "t=1757854800,v1=2086e1850f4b1d4c6b74dc61a2c6f69e4b2530bcf201cc31d15fda65e07be383",
+      "valid": true
+    },
+    {
+      "name": "one second past tolerance",
+      "secret": "bbw_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "body": "{\"v\":1,\"type\":\"vehicles.changed\",\"site_key\":\"monzes-auto\",\"seq\":42,\"sent_at\":1757854800123,\"scope\":\"cars\",\"vehicle_ids\":[\"BB-12\",\"BB-31\"],\"dry_run\":false}",
+      "t": 1757854800,
+      "now": 1757855101,
+      "header": "t=1757854800,v1=2086e1850f4b1d4c6b74dc61a2c6f69e4b2530bcf201cc31d15fda65e07be383",
+      "valid": false
+    },
+    {
+      "name": "clock ahead of sender is fine within tolerance",
+      "secret": "bbw_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "body": "{\"v\":1,\"type\":\"vehicles.changed\",\"site_key\":\"monzes-auto\",\"seq\":42,\"sent_at\":1757854800123,\"scope\":\"cars\",\"vehicle_ids\":[\"BB-12\",\"BB-31\"],\"dry_run\":false}",
+      "t": 1757854800,
+      "now": 1757854600,
+      "header": "t=1757854800,v1=2086e1850f4b1d4c6b74dc61a2c6f69e4b2530bcf201cc31d15fda65e07be383",
+      "valid": true
+    }
+  ]
+}

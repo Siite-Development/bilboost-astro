@@ -1,0 +1,15 @@
+name = "demo-biler"
+main = "@astrojs/cloudflare/entrypoints/server"
+compatibility_date = "2026-09-12"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[cache]
+enabled = true
+
+[vars]
+BILBOOST_API_BASE = "https://basic-scorpion-775.eu-west-1.convex.site"
+PUBLIC_TURNSTILE_SITE_KEY = "1x00000000000000000000AA"

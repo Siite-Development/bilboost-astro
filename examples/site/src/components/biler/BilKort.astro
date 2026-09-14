@@ -1,0 +1,31 @@
+---
+/**
+ * THE CARD — the one piece of car markup the site owns. Restyle freely; the
+ * package wraps it in `<li data-bb="card" …>` and reads its filter data from
+ * that wrapper, so nothing in here is required for behaviour.
+ */
+import type { PublicVehicle } from "bilboost-astro/contract";
+import type { CardContext } from "bilboost-astro/components/BbVehicleList.astro";
+import BbImage from "bilboost-astro/components/BbImage.astro";
+import BbPrice from "bilboost-astro/components/BbPrice.astro";
+import BbStatusBadge from "bilboost-astro/components/BbStatusBadge.astro";
+import { formatMeta, vehicleTitle } from "bilboost-astro/format";
+
+interface Props {
+  vehicle: PublicVehicle;
+  ctx: CardContext;
+}
+const { vehicle, ctx } = Astro.props;
+---
+
+<a href={ctx.href} class="bilkort">
+  <div class="bilkort__foto" data-bb="card-image">
+    {vehicle.images[0] ? <BbImage image={vehicle.images[0]} eager={ctx.eager} /> : <div class="bilkort__ingen-foto" aria-hidden="true"></div>}
+    <BbStatusBadge vehicle={vehicle} class="bilkort__badge" />
+  </div>
+  <div class="bilkort__tekst">
+    <h3 class="bilkort__titel">{vehicleTitle(vehicle)}</h3>
+    <p class="bilkort__meta">{formatMeta(vehicle)}</p>
+    <BbPrice vehicle={vehicle} class="bilkort__pris" />
+  </div>
+</a>

@@ -1,0 +1,72 @@
+---
+/**
+ * Hero image, thumbnail strip, and a `<dialog>` lightbox (centred, smaller
+ * than the screen, counter, caption, keyboard). Thumbnails are `<button>`s
+ * with the alt text in their label. Without JavaScript the buttons do
+ * nothing and the pictures stand as they are — never `<a href>` to the raw
+ * file.
+ */
+import type { PublicVehicle } from "../src/contract.ts";
+import { vehicleTitle } from "../src/format.ts";
+import { imageAttrs, SIZES } from "../src/images.ts";
+import { LABELS, t } from "../src/labels.da.ts";
+
+interface Props {
+  vehicle: PublicVehicle;
+  labels?: typeof LABELS.gallery;
+  class?: string;
+  heroClass?: string;
+  thumbsClass?: string;
+  dialogClass?: string;
+  buttonClass?: string;
+}
+const { vehicle, labels = LABELS.gallery, class: className, heroClass, thumbsClass, dialogClass, buttonClass } = Astro.props;
+const title = vehicleTitle(vehicle);
+const images = vehicle.images;
+const hero = images[0] ? imageAttrs(images[0], SIZES.hero, 1024) : null;
+---
+
+<div data-bb="gallery" class={className} data-bb-count={images.length}>
+  {hero ? (
+    <button type="button" data-bb="gallery-open" data-bb-index="0" class:list={["bb-gallery-hero", heroClass]} aria-label={t(labels.open, { alt: hero.alt })}>
+      <img src={hero.src} srcset={hero.srcset} sizes={hero.sizes} width={hero.width} height={hero.height} alt={hero.alt} loading="eager" fetchpriority="high" decoding="async" />
+    </button>
+  ) : (
+    <p data-bb="gallery-empty">{labels.none}</p>
+  )}
+
+  {images.length > 1 && (
+    <ul data-bb="gallery-thumbs" class={thumbsClass}>
+      {images.slice(1).map((image, i) => {
+        const a = imageAttrs(image, SIZES.thumb, 320);
+        return (
+          <li>
+            <button type="button" data-bb="gallery-open" data-bb-index={i + 1} aria-label={t(labels.open, { alt: a.alt })}>
+              <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width} height={a.height} alt={a.alt} loading="lazy" decoding="async" />
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  )}
+
+  {images.length > 0 && (
+    <dialog data-bb="lightbox" data-bb-sizes={SIZES.lightbox} class={dialogClass} aria-label={t(labels.dialog, { title })}>
+      <div data-bb="lightbox-panel">
+        <button type="button" data-bb="lightbox-close" class={buttonClass} aria-label={labels.close}>×</button>
+        {/* No `src` until a thumbnail is clicked: the script fills it, and a closed dialog paints nothing. */}
+        <img data-bb="lightbox-image" alt="" />
+        <div data-bb="lightbox-bar">
+          <button type="button" data-bb="lightbox-prev" class={buttonClass} aria-label={labels.prev}>‹</button>
+          <span data-bb="lightbox-counter">1 / {images.length}</span>
+          <button type="button" data-bb="lightbox-next" class={buttonClass} aria-label={labels.next}>›</button>
+        </div>
+        <p data-bb="lightbox-caption"></p>
+      </div>
+    </dialog>
+  )}
+</div>
+
+<script>
+  import "../src/client/gallery.ts";
+</script>

@@ -1,0 +1,37 @@
+---
+/**
+ * Wrap a `<ul>` of cards: below `from` px it becomes a horizontal rail with
+ * arrows (left, away from the sticky contact widget) and a progress bar.
+ * Above, the list stands as the site laid it out.
+ */
+import { LABELS, t } from "../src/labels.da.ts";
+
+interface Props {
+  label: string;
+  from?: number;
+  cardWidth?: string;
+  class?: string;
+  buttonClass?: string;
+  trackClass?: string;
+}
+const { label, from = 1024, cardWidth = "min(78vw, 320px)", class: className, buttonClass, trackClass } = Astro.props;
+---
+
+<div data-bb="rail" data-bb-rail-from={from} class={className} style={`--bb-rail-card: ${cardWidth}`}>
+  <div data-bb="rail-viewport"><slot /></div>
+  <div data-bb="rail-nav">
+    <div data-bb="rail-track" class={trackClass} aria-hidden="true"><span data-bb="rail-progress"></span></div>
+    <div data-bb="rail-arrows">
+      <button type="button" data-bb="rail-prev" class={buttonClass} aria-label={t(LABELS.rail.prev, { label })}>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="20" height="20"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+      <button type="button" data-bb="rail-next" class={buttonClass} aria-label={t(LABELS.rail.next, { label })}>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="20" height="20"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import "../src/client/rail.ts";
+</script>

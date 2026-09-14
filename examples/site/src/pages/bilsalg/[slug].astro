@@ -1,0 +1,137 @@
+---
+/**
+ * The detail page. Resolves the BB id out of the slug, redirects a stale
+ * slug to the current one, and hands the four states (ok / sold / not found /
+ * unavailable) to the package's components.
+ */
+export const prerender = false;
+
+import { getLiveCollection, getLiveEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import BilKort from "../../components/biler/BilKort.astro";
+import { BILBOOST } from "../../config/bilboost.mjs";
+import { getConfig } from "bilboost-astro";
+import { applyCache, markUnavailable } from "bilboost-astro/cache";
+import { similar } from "bilboost-astro/criteria";
+import { vehicleTitle } from "bilboost-astro/format";
+import { mergeLabels } from "bilboost-astro/labels";
+import { BilboostError, getLastDealer } from "bilboost-astro/loader";
+import { canonicalPath, parseSlug } from "bilboost-astro/slug";
+import { tagsFor } from "bilboost-astro/tags";
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
+import BbEquipment from "bilboost-astro/components/BbEquipment.astro";
+import BbInquiryForm from "bilboost-astro/components/BbInquiryForm.astro";
+import BbJsonLd from "bilboost-astro/components/BbJsonLd.astro";
+import BbPrice from "bilboost-astro/components/BbPrice.astro";
+import BbRail from "bilboost-astro/components/BbRail.astro";
+import BbStatusBadge from "bilboost-astro/components/BbStatusBadge.astro";
+import BbUnavailable from "bilboost-astro/components/BbUnavailable.astro";
+import BbVehicleFacts from "bilboost-astro/components/BbVehicleFacts.astro";
+import BbVehicleGallery from "bilboost-astro/components/BbVehicleGallery.astro";
+import BbVehicleList from "bilboost-astro/components/BbVehicleList.astro";
+import "../../styles/bilboost.css";
+
+const cfg = await getConfig();
+const labels = mergeLabels(BILBOOST.labels);
+const t = tagsFor(cfg.siteKey);
+const slug = Astro.params.slug ?? "";
+const id = parseSlug(slug);
+
+if (!id) {
+  applyCache(Astro, "gone", cfg, { tags: [t.all] });
+  Astro.response.status = 404;
+}
+
+const { entry, error, cacheHint } = id ? await getLiveEntry("biler", id) : { entry: undefined, error: undefined, cacheHint: undefined };
+const bbError = error instanceof BilboostError ? error : error ? new BilboostError("unavailable", error.message) : null;
+
+if (bbError?.code === "sold" || bbError?.code === "not_found") {
+  Astro.response.status = bbError.code === "sold" ? 410 : 404;
+  applyCache(Astro, "gone", cfg, { tags: [t.all, t.car(id!)] });
+} else if (bbError) {
+  markUnavailable(Astro);
+}
+
+const vehicle = entry?.data ?? null;
+if (vehicle && vehicle.slug !== slug) {
+  return Astro.redirect(canonicalPath(cfg.basePath, vehicle), 301);
+}
+let related: typeof vehicle[] = [];
+if (vehicle) {
+  if (BILBOOST.similar) {
+    const all = await getLiveCollection("biler");
+    if (all.entries) related = similar(all.entries.map((e) => e.data), vehicle, 4);
+  }
+  // Once, last: related cards change when the list changes, so the page also carries the list tag.
+  applyCache(Astro, "detail", cfg, cacheHint, related.length > 0 ? [t.list] : []);
+}
+const canonical = vehicle ? `${cfg.siteUrl}${canonicalPath(cfg.basePath, vehicle)}` : undefined;
+const title = vehicle ? vehicleTitle(vehicle) : labels.detail.not_found_heading;
+---
+
+<Layout title={title} canonical={canonical}>
+  {!vehicle ? (
+    <section class="section"><div class="container-site">
+      <BbUnavailable
+        variant={bbError?.code === "sold" ? "sold" : bbError?.code === "unavailable" ? "unavailable" : "not_found"}
+        basePath={cfg.basePath}
+        stub={bbError?.stub}
+        phone={BILBOOST.phone}
+      />
+    </div></section>
+  ) : (
+    <>
+      <section class="section" data-section="bil-hero">
+        <div class="container-site bil">
+          <a href={`${cfg.basePath}/`} class="bil__tilbage">{labels.detail.back}</a>
+          <BbVehicleGallery vehicle={vehicle} class="bil__galleri" buttonClass={BILBOOST.classes.secondaryButton} />
+          <div class="bil__side">
+            <h1 class="bil__titel">{vehicleTitle(vehicle)} <BbStatusBadge vehicle={vehicle} class="bil__badge" /></h1>
+            <BbPrice vehicle={vehicle} showDelivery class="bil__pris" />
+            <BbVehicleFacts vehicle={vehicle} class="bil__fakta" />
+          </div>
+        </div>
+      </section>
+
+      {vehicle.description && (
+        <section class="section" data-section="bil-beskrivelse"><div class="container-site measure">
+          <h2>{labels.detail.description}</h2>
+          <p class="bil__beskrivelse">{vehicle.description}</p>
+        </div></section>
+      )}
+
+      <section class="section" data-section="bil-udstyr"><div class="container-site">
+        <BbEquipment vehicle={vehicle} class="bil__udstyr" />
+      </div></section>
+
+      <section class="section" data-section="bil-henvendelse"><div class="container-site">
+        <BbInquiryForm
+          vehicle={vehicle}
+          apiBase={cfg.apiBase}
+          siteKey={cfg.siteKey}
+          turnstileSiteKey={PUBLIC_TURNSTILE_SITE_KEY}
+          phone={BILBOOST.phone}
+          labels={labels.inquiry}
+          class="bil__formular"
+          fieldClass={BILBOOST.classes.field}
+          inputClass={BILBOOST.classes.input}
+          buttonClass={BILBOOST.classes.button}
+          secondaryButtonClass={BILBOOST.classes.secondaryButton}
+        />
+      </div></section>
+
+      {related.length > 0 && (
+        <section class="section" data-section="bil-lignende"><div class="container-site">
+          <h2>{labels.detail.similar}</h2>
+          <BbRail label="bil" buttonClass={BILBOOST.classes.secondaryButton}>
+            <BbVehicleList vehicles={related} basePath={cfg.basePath} listClass="bilsalg__liste">
+              <fragment slot="card">{(v, ctx) => <BilKort vehicle={v} ctx={ctx} />}</fragment>
+            </BbVehicleList>
+          </BbRail>
+        </div></section>
+      )}
+
+      <BbJsonLd vehicle={vehicle} siteUrl={cfg.siteUrl} basePath={cfg.basePath} dealer={getLastDealer()} />
+    </>
+  )}
+</Layout>

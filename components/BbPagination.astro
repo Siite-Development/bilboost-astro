@@ -1,0 +1,30 @@
+---
+/**
+ * Server-side paging links. Hidden by the filter script when the whole list
+ * is on the page (live filtering shows more on demand instead).
+ */
+import type { Criteria } from "../src/criteria.ts";
+import { canonicalQuery } from "../src/criteria.ts";
+import { LABELS, t } from "../src/labels.da.ts";
+import { listPath } from "../src/slug.ts";
+
+interface Props {
+  page: number;
+  pages: number;
+  criteria: Criteria;
+  basePath: string;
+  labels?: typeof LABELS.pagination;
+  class?: string;
+  linkClass?: string;
+}
+const { page, pages, criteria, basePath, labels = LABELS.pagination, class: className, linkClass } = Astro.props;
+const href = (n: number) => `${listPath(basePath)}${canonicalQuery({ ...criteria, side: n })}`;
+---
+
+{pages > 1 && (
+  <nav data-bb="pagination" class={className} aria-label={t(labels.page, { n: page, m: pages })}>
+    {page > 1 ? <a href={href(page - 1)} rel="prev" data-bb="pagination-prev" class={linkClass}>{labels.prev}</a> : <span data-bb="pagination-prev" aria-disabled="true" class={linkClass}>{labels.prev}</span>}
+    <span data-bb="pagination-status">{t(labels.page, { n: page, m: pages })}</span>
+    {page < pages ? <a href={href(page + 1)} rel="next" data-bb="pagination-next" class={linkClass}>{labels.next}</a> : <span data-bb="pagination-next" aria-disabled="true" class={linkClass}>{labels.next}</span>}
+  </nav>
+)}

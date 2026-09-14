@@ -1,0 +1,20 @@
+{
+  "name": "bilboost-example-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler dev",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "14.3.1",
+    "@astrojs/sitemap": "^3.5.0",
+    "astro": "7.3.2",
+    "bilboost-astro": "file:../.."
+  },
+  "devDependencies": {
+    "wrangler": "^4.107.0"
+  }
+}

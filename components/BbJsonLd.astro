@@ -1,0 +1,22 @@
+---
+/** schema.org `Car` (detail) or `ItemList` (list). */
+import type { PublicDealer, PublicVehicle } from "../src/contract.ts";
+import { listJsonLd, serializeJsonLd, vehicleJsonLd } from "../src/jsonld.ts";
+
+interface Props {
+  vehicle?: PublicVehicle;
+  vehicles?: PublicVehicle[];
+  siteUrl: string;
+  basePath: string;
+  dealer?: PublicDealer | null;
+  listName?: string;
+}
+const { vehicle, vehicles, siteUrl, basePath, dealer = null, listName = "Biler til salg" } = Astro.props;
+const data = vehicle
+  ? vehicleJsonLd(vehicle, { siteUrl, basePath, dealer })
+  : vehicles
+    ? listJsonLd(vehicles, { siteUrl, basePath, name: listName })
+    : null;
+---
+
+{data && <script type="application/ld+json" set:html={serializeJsonLd(data)} />}
