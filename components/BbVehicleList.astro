@@ -14,6 +14,7 @@
  * shows more on demand. Omit it for pure server-side paging.
  */
 import type { PublicVehicle } from "../src/contract.ts";
+import { advertisedTotal } from "../src/format.ts";
 import { canonicalPath } from "../src/slug.ts";
 
 interface Props {
@@ -56,7 +57,7 @@ const cards = await Promise.all(
       data-bb-make={v.make}
       data-bb-model={v.model}
       data-bb-fuel={v.fuel_type ?? ""}
-      data-bb-price={v.price ?? ""}
+      data-bb-price={advertisedTotal(v) ?? ""}
       data-bb-year={v.year ?? ""}
       data-bb-km={v.mileage ?? ""}
       data-bb-status={v.status}

@@ -37,7 +37,7 @@ attribute selectors. Both work; pick one per site.
 | `data-bb="gallery-empty"` | no photos |
 | `data-bb="lightbox"` | `<dialog>` — centred, `max-width: min(90vw, 62rem)`, image `max-height: 72dvh` (in `styles/base.css`) |
 | `data-bb="lightbox-panel"`, `-image`, `-bar`, `-prev`, `-next`, `-close`, `-counter`, `-caption` | inside the dialog |
-| `data-bb="price"` `data-bb-has-price="1\|0"` | `<span>`; inner `price-amount`, `price-delivery` |
+| `data-bb="price"` `data-bb-has-price="1\|0"` | `<span>`; inner `price-amount` (the advertised TOTAL incl. delivery), `price-delivery` ("heraf leveringsomkostninger …") |
 | `data-bb="status"` `data-bb-status="reserveret"` | badge; absent on a car in stock |
 | `data-bb="facts"` | `<section>`; `facts-heading`, `facts-list` (`<dl>`), `fact` (`<div>` with `<dt><dd>`) |
 | `data-bb="equipment"` | `<section>`; `equipment-heading`, `equipment-list` (`<ul>`) |

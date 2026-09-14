@@ -41,7 +41,7 @@ export const LABELS = {
     facts: "Fakta",
     equipment: "Udstyr",
     description: "Beskrivelse",
-    price_note: "Prisen er ekskl. leveringsomkostninger",
+    price_note: "Prisen er inkl. leveringsomkostninger",
     back: "Tilbage til alle biler",
     similar: "Lignende biler",
     sold_heading: "Denne bil er solgt",

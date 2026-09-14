@@ -45,6 +45,8 @@ export type PublicVehicle = {
   fuel_type: string | null;
   price: number | null;
   delivery_cost: number | null;
+  /** Whether `price` already includes the mandatory delivery costs; see `advertisedTotal`. */
+  price_includes_delivery: boolean | null;
   green_tax: number | null;
   description: string | null;
   equipment: string[];

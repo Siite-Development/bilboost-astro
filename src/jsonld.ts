@@ -1,5 +1,5 @@
 import type { PublicDealer, PublicVehicle } from "./contract.ts";
-import { vehicleTitle } from "./format.ts";
+import { advertisedTotal, vehicleTitle } from "./format.ts";
 import { canonicalPath } from "./slug.ts";
 
 /**
@@ -49,7 +49,7 @@ export const vehicleJsonLd = (
       "@type": "Offer",
       url,
       priceCurrency: "DKK",
-      ...(v.price !== null && v.price > 0 ? { price: v.price } : {}),
+      ...(advertisedTotal(v) !== null ? { price: advertisedTotal(v) } : {}),
       availability: v.status === "reserveret" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
       ...(seller(ctx.dealer, ctx.siteUrl) ? { seller: seller(ctx.dealer, ctx.siteUrl) } : {}),
     },

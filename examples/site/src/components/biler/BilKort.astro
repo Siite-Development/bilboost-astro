@@ -26,6 +26,6 @@ const { vehicle, ctx } = Astro.props;
   <div class="bilkort__tekst">
     <h3 class="bilkort__titel">{vehicleTitle(vehicle)}</h3>
     <p class="bilkort__meta">{formatMeta(vehicle)}</p>
-    <BbPrice vehicle={vehicle} class="bilkort__pris" />
+    <BbPrice vehicle={vehicle} showDelivery={false} class="bilkort__pris" />
   </div>
 </a>

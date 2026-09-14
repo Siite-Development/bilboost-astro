@@ -17,6 +17,21 @@ export const formatDKK = (value: number | null | undefined): string =>
 export const formatPrice = (value: number | null | undefined): string =>
   value === null || value === undefined || value <= 0 ? "Pris efter aftale" : `${dkk.format(value)} kr.`;
 
+/**
+ * The price a Danish dealer must advertise: ONE total including the
+ * mandatory delivery costs (prismærkningsreglerne, 1 April 2018). Auto IT
+ * prices already are that total (`price_includes_delivery: true`); a typed
+ * price is the bare retail price and gets the delivery costs added. `null`
+ * when there is no price at all ("Pris efter aftale").
+ */
+export const advertisedTotal = (
+  v: Pick<PublicVehicle, "price" | "delivery_cost" | "price_includes_delivery">,
+): number | null => {
+  if (v.price === null || v.price <= 0) return null;
+  if (v.price_includes_delivery) return v.price;
+  return v.price + (v.delivery_cost ?? 0);
+};
+
 export const formatKm = (value: number | null | undefined): string =>
   value === null || value === undefined ? "—" : `${dkk.format(value)} km`;
 

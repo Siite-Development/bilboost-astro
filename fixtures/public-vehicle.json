@@ -13,16 +13,29 @@
     "fuel_type": "Diesel",
     "price": 289900,
     "delivery_cost": 4380,
+    "price_includes_delivery": true,
     "green_tax": 1200,
     "description": "Velholdt bil med fuld servicehistorik.",
-    "equipment": ["Navigation", "Sædevarme"],
+    "equipment": [
+      "Navigation",
+      "Sædevarme"
+    ],
     "images": [
       {
         "alt": "BMW 320d Touring Aut.",
         "variants": [
-          { "width": 320, "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/320" },
-          { "width": 640, "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/640" },
-          { "width": 1024, "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/1024" }
+          {
+            "width": 320,
+            "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/320"
+          },
+          {
+            "width": 640,
+            "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/640"
+          },
+          {
+            "width": 1024,
+            "url": "https://imageapi.autoit.dk/ImageService.svc/GetVehicleImageFromImageId/abc123/1024"
+          }
         ]
       }
     ],

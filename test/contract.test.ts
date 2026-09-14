@@ -8,7 +8,7 @@ describe("contract v1", () => {
     const v = fixture.vehicle as PublicVehicle;
     expect(Object.keys(v)).toEqual([
       "id", "slug", "status", "make", "model", "variant", "year", "mileage", "color", "fuel_type",
-      "price", "delivery_cost", "green_tax", "description", "equipment", "images", "specs", "created_at", "updated_at",
+      "price", "delivery_cost", "price_includes_delivery", "green_tax", "description", "equipment", "images", "specs", "created_at", "updated_at",
     ]);
     expect(Object.keys(v.specs)).toEqual([...SPEC_KEYS]);
     expect(v.slug.endsWith("-bb-12")).toBe(true);

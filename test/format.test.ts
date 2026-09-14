@@ -30,3 +30,13 @@ describe("format", () => {
     expect(facts.map((f) => f.label)).not.toContain("Rækkevidde (WLTP)");
   });
 });
+
+describe("advertisedTotal", () => {
+  test("Auto IT price is already the total; a typed price gets delivery added; no price is null", async () => {
+    const { advertisedTotal } = await import("../src/format.ts");
+    expect(advertisedTotal({ price: 289_900, delivery_cost: 4_380, price_includes_delivery: true })).toBe(289_900);
+    expect(advertisedTotal({ price: 100_000, delivery_cost: 4_380, price_includes_delivery: false })).toBe(104_380);
+    expect(advertisedTotal({ price: 100_000, delivery_cost: null, price_includes_delivery: false })).toBe(100_000);
+    expect(advertisedTotal({ price: null, delivery_cost: 4_380, price_includes_delivery: null })).toBeNull();
+  });
+});

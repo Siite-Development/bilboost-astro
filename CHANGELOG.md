@@ -3,6 +3,15 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.1 — 2026-09-14
+
+- The advertised price is the TOTAL including mandatory delivery costs, as
+  Danish prismærkningsregler require (contract field
+  `price_includes_delivery`, additive). `BbPrice` shows the total with
+  "heraf leveringsomkostninger …" under it; price filters, sorting, facets,
+  "lignende biler" and JSON-LD use the total. `data-bb-price` on a card is
+  the total.
+
 ## 0.1.0 — 2026-09-14
 
 First cut, built against BilBoost contract v1 and `astro@7.3.2` /

@@ -1,4 +1,5 @@
 import type { PublicVehicle } from "./contract.ts";
+import { advertisedTotal } from "./format.ts";
 
 /**
  * Filtering, sorting, paging and search over the list, driven by URL query
@@ -91,8 +92,9 @@ export const matchesCriteria = (v: PublicVehicle, c: Criteria): boolean => {
   if (c.maerke && searchFold(v.make) !== searchFold(c.maerke)) return false;
   if (c.model && searchFold(v.model) !== searchFold(c.model)) return false;
   if (c.braendstof && searchFold(v.fuel_type ?? "") !== searchFold(c.braendstof)) return false;
-  if (c.pris_min !== null && (v.price === null || v.price < c.pris_min)) return false;
-  if (c.pris_max !== null && (v.price === null || v.price > c.pris_max)) return false;
+  const total = advertisedTotal(v);
+  if (c.pris_min !== null && (total === null || total < c.pris_min)) return false;
+  if (c.pris_max !== null && (total === null || total > c.pris_max)) return false;
   if (c.aar_min !== null && (v.year === null || v.year < c.aar_min)) return false;
   if (c.km_max !== null && (v.mileage === null || v.mileage > c.km_max)) return false;
   if (c.q) return matchesSearch(v, c.q);
@@ -128,8 +130,8 @@ const nullsLast = (a: number | null, b: number | null, dir: 1 | -1): number => {
 export const sortVehicles = (vehicles: PublicVehicle[], sort: Sort): PublicVehicle[] => {
   const out = [...vehicles];
   switch (sort) {
-    case "pris_stigende": return out.sort((a, b) => nullsLast(a.price, b.price, 1));
-    case "pris_faldende": return out.sort((a, b) => nullsLast(a.price, b.price, -1));
+    case "pris_stigende": return out.sort((a, b) => nullsLast(advertisedTotal(a), advertisedTotal(b), 1));
+    case "pris_faldende": return out.sort((a, b) => nullsLast(advertisedTotal(a), advertisedTotal(b), -1));
     case "km": return out.sort((a, b) => nullsLast(a.mileage, b.mileage, 1));
     case "aar": return out.sort((a, b) => nullsLast(a.year, b.year, -1));
     default: return out.sort((a, b) => b.created_at - a.created_at);
@@ -160,7 +162,7 @@ export const facets = (vehicles: PublicVehicle[], c?: Pick<Criteria, "maerke">):
     makes: count(vehicles.map((v) => v.make)),
     models: count(forModels.map((v) => v.model)),
     fuels: count(vehicles.map((v) => v.fuel_type)),
-    price: range(vehicles.map((v) => v.price)),
+    price: range(vehicles.map(advertisedTotal)),
     year: range(vehicles.map((v) => v.year)),
   };
 };
@@ -185,7 +187,9 @@ export const similar = (vehicles: PublicVehicle[], v: PublicVehicle, n = 4): Pub
       let score = 0;
       if (o.make === v.make) score += 4;
       if (o.fuel_type && o.fuel_type === v.fuel_type) score += 2;
-      if (o.price !== null && v.price !== null) score += Math.max(0, 2 - Math.abs(o.price - v.price) / Math.max(v.price, 1));
+      const a = advertisedTotal(o);
+      const b = advertisedTotal(v);
+      if (a !== null && b !== null) score += Math.max(0, 2 - Math.abs(a - b) / Math.max(b, 1));
       return { o, score };
     })
     .sort((a, b) => b.score - a.score)

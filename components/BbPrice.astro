@@ -1,23 +1,26 @@
 ---
 /**
- * The price, formatted the Danish way, or "Pris efter aftale". Delivery
- * costs are a separate line by Danish convention; `showDelivery` adds it.
+ * The advertised price: ONE total including the mandatory delivery costs, as
+ * Danish prismærkningsregler require, or "Pris efter aftale". The delivery
+ * share is shown as a line under it so the number is transparent.
  */
 import type { PublicVehicle } from "../src/contract.ts";
-import { formatDKK, formatPrice } from "../src/format.ts";
+import { advertisedTotal, formatDKK, formatPrice } from "../src/format.ts";
 
 interface Props {
-  vehicle: Pick<PublicVehicle, "price" | "delivery_cost">;
+  vehicle: Pick<PublicVehicle, "price" | "delivery_cost" | "price_includes_delivery">;
+  /** Show "heraf leveringsomkostninger X kr." under the total. Default true. */
   showDelivery?: boolean;
   deliveryLabel?: string;
   class?: string;
 }
-const { vehicle, showDelivery = false, deliveryLabel = "Leveringsomkostninger", class: className } = Astro.props;
+const { vehicle, showDelivery = true, deliveryLabel = "heraf leveringsomkostninger", class: className } = Astro.props;
+const total = advertisedTotal(vehicle);
 ---
 
-<span data-bb="price" data-bb-has-price={vehicle.price !== null && vehicle.price > 0 ? "1" : "0"} class={className}>
-  <span data-bb="price-amount">{formatPrice(vehicle.price)}</span>
-  {showDelivery && vehicle.delivery_cost !== null && (
-    <span data-bb="price-delivery">{deliveryLabel}: {formatDKK(vehicle.delivery_cost)}</span>
+<span data-bb="price" data-bb-has-price={total !== null ? "1" : "0"} class={className}>
+  <span data-bb="price-amount">{formatPrice(total)}</span>
+  {showDelivery && total !== null && vehicle.delivery_cost !== null && vehicle.delivery_cost > 0 && (
+    <span data-bb="price-delivery">{deliveryLabel} {formatDKK(vehicle.delivery_cost)}</span>
   )}
 </span>

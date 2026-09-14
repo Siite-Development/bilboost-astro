@@ -87,7 +87,7 @@ const title = vehicle ? vehicleTitle(vehicle) : labels.detail.not_found_heading;
           <BbVehicleGallery vehicle={vehicle} class="bil__galleri" buttonClass={BILBOOST.classes.secondaryButton} />
           <div class="bil__side">
             <h1 class="bil__titel">{vehicleTitle(vehicle)} <BbStatusBadge vehicle={vehicle} class="bil__badge" /></h1>
-            <BbPrice vehicle={vehicle} showDelivery class="bil__pris" />
+            <BbPrice vehicle={vehicle} class="bil__pris" />
             <BbVehicleFacts vehicle={vehicle} class="bil__fakta" />
           </div>
         </div>
