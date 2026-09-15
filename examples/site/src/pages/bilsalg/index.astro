@@ -35,37 +35,184 @@ const vehicles = (entries ?? []).map((e) => e.data);
 const page = applyCriteria(vehicles, criteria, BILBOOST.pageSize);
 if (!error) applyCache(Astro, "list", cfg, cacheHint);
 const canonical = `${cfg.siteUrl}${cfg.basePath}/`;
+const visLabel = (n: number) => (n === 1 ? "Vis 1 bil" : `Vis ${n} biler`);
 ---
 
 <Layout title={labels.list.heading} canonical={canonical}>
-  <section class="section" data-section="bilsalg">
+  <section class="side-top" data-section="bilsalg-top">
     <div class="container-site">
+      <nav class="brodkrumme" aria-label="Brødkrumme">
+        <a href="/">Forside</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Bilsalg</span>
+      </nav>
       <h1>{labels.list.heading}</h1>
+      <p class="side-top__intro">Bilerne opdateres automatisk fra vores lager. Find din næste bil, og skriv eller ring, hvis du har spørgsmål.</p>
+    </div>
+  </section>
 
+  <section class="section section--liste" data-section="bilsalg">
+    <div class="container-site">
       {error ? (
-        <BbUnavailable variant="unavailable" basePath={cfg.basePath} phone={BILBOOST.phone} />
+        <BbUnavailable variant="unavailable" basePath={cfg.basePath} phone={BILBOOST.phone} class="tilstand" />
       ) : (
         <div data-bb="listing" class="bilsalg">
-          <BbFilters
-            criteria={criteria}
-            facets={facets(vehicles, criteria)}
-            basePath={cfg.basePath}
-            show={BILBOOST.filters}
-            labels={labels.filters}
-            class="bilsalg__filtre"
-            fieldClass={BILBOOST.classes.field}
-            inputClass={BILBOOST.classes.input}
-            buttonClass={BILBOOST.classes.button}
-          />
-          <BbResultCount total={page.total} one={labels.list.count_one} many={labels.list.count_many} class="bilsalg__antal" />
-          <BbVehicleList vehicles={page.items} all={vehicles} basePath={cfg.basePath} pageSize={BILBOOST.pageSize} moreClass={BILBOOST.classes.secondaryButton} listClass="bilsalg__liste">
-            <fragment slot="card">{(vehicle, ctx) => <BilKort vehicle={vehicle} ctx={ctx} />}</fragment>
-          </BbVehicleList>
-          <BbEmpty basePath={cfg.basePath} hidden={page.total > 0} message={labels.list.empty} resetLabel={labels.list.empty_reset} />
-          <BbPagination page={page.page} pages={page.pages} criteria={criteria} basePath={cfg.basePath} linkClass={BILBOOST.classes.secondaryButton} />
+          <div class="bilsalg__sog" data-sog-slot></div>
+
+          <details class="filterboks" data-filterboks open>
+            <summary class="filterboks__knap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><path d="M16 5v4M10 15v4"></path></svg>
+              <span class="filterboks__tekst-mobil">Alle filtre</span>
+              <span class="filterboks__tekst-desktop">Filtrér biler</span>
+              <span class="filterboks__antal" data-filter-antal hidden></span>
+            </summary>
+
+            <div class="filterboks__panel" role="group" aria-label="Filtre">
+              <div class="filterboks__panel-top">
+                <p class="filterboks__panel-titel" tabindex="-1" data-filterpanel-titel>Alle filtre</p>
+                <button type="button" class="filterboks__luk" data-filterpanel-luk aria-label="Luk filtre">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+                </button>
+              </div>
+              <div class="filterboks__krop" data-lenis-prevent>
+                <BbFilters
+                  criteria={criteria}
+                  facets={facets(vehicles, criteria)}
+                  basePath={cfg.basePath}
+                  show={BILBOOST.filters}
+                  labels={labels.filters}
+                  class="bilsalg__filtre"
+                  fieldClass={BILBOOST.classes.field}
+                  inputClass={BILBOOST.classes.input}
+                  buttonClass={BILBOOST.classes.button}
+                />
+              </div>
+              <div class="filterboks__bund">
+                <a href={`${cfg.basePath}/`} class="filterboks__nulstil">Nulstil</a>
+                <button type="button" class="btn btn-primary" data-filterpanel-vis>{visLabel(page.total)}</button>
+              </div>
+            </div>
+          </details>
+
+          <div class="bilsalg__resultat" data-resultat>
+            <div class="resultat-top">
+              <BbResultCount total={page.total} one={labels.list.count_one} many={labels.list.count_many} class="bilsalg__antal" />
+              <div class="resultat-top__sort" data-sort-slot></div>
+            </div>
+            <BbVehicleList vehicles={page.items} all={vehicles} basePath={cfg.basePath} pageSize={BILBOOST.pageSize} moreClass={BILBOOST.classes.secondaryButton} listClass="bilsalg__liste">
+              <fragment slot="card">{(vehicle, ctx) => <BilKort vehicle={vehicle} ctx={ctx} />}</fragment>
+            </BbVehicleList>
+            <BbEmpty basePath={cfg.basePath} hidden={page.total > 0} message={labels.list.empty} resetLabel={labels.list.empty_reset} class="tilstand" />
+            <BbPagination page={page.page} pages={page.pages} criteria={criteria} basePath={cfg.basePath} linkClass={BILBOOST.classes.secondaryButton} />
+          </div>
           <BbJsonLd vehicles={page.items} siteUrl={cfg.siteUrl} basePath={cfg.basePath} dealer={getLastDealer()} listName={labels.list.heading} />
         </div>
       )}
     </div>
   </section>
 </Layout>
+
+<script>
+  /*
+   * Layout only; filtering stays the package's. With JavaScript:
+   *  - the search field moves above the results and the sort field next to the
+   *    count. Both keep belonging to the filter form through the `form`
+   *    attribute, and their input is relayed to the form so live filtering sees it;
+   *  - below 1024 px the filters open as a full-screen panel with "Vis N biler".
+   * Without JavaScript everything stays in the one form, open, as the package renders it.
+   */
+  const root = document.querySelector<HTMLElement>('[data-bb="listing"]');
+  const box = root?.querySelector<HTMLDetailsElement>("[data-filterboks]");
+  const form = root?.querySelector<HTMLFormElement>('form[data-bb="filters"]');
+  const list = root?.querySelector<HTMLElement>('[data-bb="list"]');
+
+  if (root && box && form) {
+    root.classList.add("bilsalg--js");
+    box.classList.add("filterboks--js");
+    if (!form.id) form.id = "bb-filtre";
+
+    const relocate = (key: string, slotSelector: string) => {
+      const field = form.querySelector<HTMLElement>(`[data-bb-filter="${key}"]`);
+      const slot = root.querySelector<HTMLElement>(slotSelector);
+      if (!field || !slot) return;
+      field.querySelectorAll<HTMLInputElement | HTMLSelectElement>("input, select").forEach((el) => {
+        el.setAttribute("form", form.id);
+        el.addEventListener("input", () => form.dispatchEvent(new Event("input", { bubbles: true })));
+      });
+      slot.appendChild(field);
+    };
+    relocate("q", "[data-sog-slot]");
+    relocate("sort", "[data-sort-slot]");
+
+    const badge = box.querySelector<HTMLElement>("[data-filter-antal]");
+    const visBtn = box.querySelector<HTMLButtonElement>("[data-filterpanel-vis]");
+    const titel = box.querySelector<HTMLElement>("[data-filterpanel-titel]");
+    const summary = box.querySelector<HTMLElement>("summary");
+
+    const countActive = () => {
+      if (!badge) return;
+      const active = [...new FormData(form).entries()].filter(([k, v]) => k !== "sort" && k !== "q" && String(v).trim() !== "").length;
+      badge.textContent = String(active);
+      badge.hidden = active === 0;
+    };
+    countActive();
+    form.addEventListener("input", countActive);
+    list?.addEventListener("bb:filtered", (e) => {
+      const n = (e as CustomEvent<{ count: number }>).detail.count;
+      if (visBtn) visBtn.textContent = n === 1 ? "Vis 1 bil" : `Vis ${n} biler`;
+    });
+
+    // Scroll lock that survives themes and iOS (house rule: modal-scroll-lock).
+    let scrollY = 0;
+    let locked = false;
+    const lock = () => {
+      if (locked) return;
+      scrollY = window.scrollY;
+      document.documentElement.style.setProperty("overflow", "hidden", "important");
+      Object.assign(document.body.style, { position: "fixed", top: `-${scrollY}px`, left: "0", right: "0", width: "100%" });
+      locked = true;
+    };
+    const unlock = () => {
+      if (!locked) return;
+      document.documentElement.style.overflow = "";
+      Object.assign(document.body.style, { position: "", top: "", left: "", right: "", width: "" });
+      window.scrollTo(0, scrollY);
+      locked = false;
+    };
+
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const sync = () => {
+      if (wide.matches) {
+        unlock();
+        box.open = true;
+      } else {
+        box.open = false;
+      }
+    };
+    sync();
+    wide.addEventListener("change", sync);
+
+    summary?.addEventListener("click", (e) => {
+      if (wide.matches) e.preventDefault();
+    });
+    box.addEventListener("toggle", () => {
+      if (wide.matches) return;
+      if (box.open) {
+        lock();
+        titel?.focus();
+      } else {
+        unlock();
+      }
+    });
+    const close = (thenScroll: boolean) => {
+      box.open = false;
+      if (thenScroll) root.querySelector("[data-resultat]")?.scrollIntoView({ block: "start" });
+      else summary?.focus();
+    };
+    box.querySelector("[data-filterpanel-luk]")?.addEventListener("click", () => close(false));
+    visBtn?.addEventListener("click", () => close(true));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && box.open && !wide.matches) close(false);
+    });
+  }
+</script>

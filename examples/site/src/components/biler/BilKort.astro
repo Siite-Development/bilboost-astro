@@ -9,13 +9,16 @@ import type { CardContext } from "bilboost-astro/components/BbVehicleList.astro"
 import BbImage from "bilboost-astro/components/BbImage.astro";
 import BbPrice from "bilboost-astro/components/BbPrice.astro";
 import BbStatusBadge from "bilboost-astro/components/BbStatusBadge.astro";
-import { formatMeta, vehicleTitle } from "bilboost-astro/format";
+import { formatKm } from "bilboost-astro/format";
 
 interface Props {
   vehicle: PublicVehicle;
   ctx: CardContext;
 }
 const { vehicle, ctx } = Astro.props;
+const specs = [vehicle.year ? String(vehicle.year) : null, vehicle.mileage !== null ? formatKm(vehicle.mileage) : null, vehicle.fuel_type].filter(
+  (s): s is string => Boolean(s),
+);
 ---
 
 <a href={ctx.href} class="bilkort">
@@ -24,8 +27,19 @@ const { vehicle, ctx } = Astro.props;
     <BbStatusBadge vehicle={vehicle} class="bilkort__badge" />
   </div>
   <div class="bilkort__tekst">
-    <h3 class="bilkort__titel">{vehicleTitle(vehicle)}</h3>
-    <p class="bilkort__meta">{formatMeta(vehicle)}</p>
-    <BbPrice vehicle={vehicle} showDelivery={false} class="bilkort__pris" />
+    <h3 class="bilkort__titel">{vehicle.make} {vehicle.model}</h3>
+    {vehicle.variant && <p class="bilkort__variant">{vehicle.variant}</p>}
+    {specs.length > 0 && (
+      <ul class="bilkort__specs">
+        {specs.map((s) => <li>{s}</li>)}
+      </ul>
+    )}
+    <div class="bilkort__bund">
+      <BbPrice vehicle={vehicle} showDelivery={false} class="bilkort__pris" />
+      <span class="bilkort__se" aria-hidden="true">
+        Se bilen
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+      </span>
+    </div>
   </div>
 </a>

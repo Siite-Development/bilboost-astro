@@ -13,13 +13,14 @@ import { BILBOOST } from "../../config/bilboost.mjs";
 import { getConfig } from "bilboost-astro";
 import { applyCache, markUnavailable } from "bilboost-astro/cache";
 import { similar } from "bilboost-astro/criteria";
-import { vehicleTitle } from "bilboost-astro/format";
+import { formatKm, formatSpec, vehicleTitle } from "bilboost-astro/format";
 import { mergeLabels } from "bilboost-astro/labels";
 import { BilboostError, getLastDealer } from "bilboost-astro/loader";
 import { canonicalPath, parseSlug } from "bilboost-astro/slug";
 import { tagsFor } from "bilboost-astro/tags";
 import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
 import BbEquipment from "bilboost-astro/components/BbEquipment.astro";
+import BbImage from "bilboost-astro/components/BbImage.astro";
 import BbInquiryForm from "bilboost-astro/components/BbInquiryForm.astro";
 import BbJsonLd from "bilboost-astro/components/BbJsonLd.astro";
 import BbPrice from "bilboost-astro/components/BbPrice.astro";
@@ -67,9 +68,20 @@ if (vehicle) {
 }
 const canonical = vehicle ? `${cfg.siteUrl}${canonicalPath(cfg.basePath, vehicle)}` : undefined;
 const title = vehicle ? vehicleTitle(vehicle) : labels.detail.not_found_heading;
+const tel = BILBOOST.phone.replace(/\s+/g, "");
+const dealer = vehicle ? getLastDealer() : null;
+const keyFacts = vehicle
+  ? [
+      vehicle.year ? { label: "Årgang", value: String(vehicle.year) } : null,
+      vehicle.mileage !== null ? { label: "Kilometer", value: formatKm(vehicle.mileage) } : null,
+      vehicle.fuel_type ? { label: "Brændstof", value: vehicle.fuel_type } : null,
+      vehicle.specs.horsepower ? { label: "Effekt", value: formatSpec("horsepower", vehicle.specs.horsepower) } : null,
+    ].filter((f): f is { label: string; value: string } => f !== null)
+  : [];
+const phoneIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>`;
 ---
 
-<Layout title={title} canonical={canonical}>
+<Layout title={title} canonical={canonical} bodyClass={vehicle ? "har-handlingsbar" : undefined}>
   {!vehicle ? (
     <section class="section"><div class="container-site">
       <BbUnavailable
@@ -77,53 +89,140 @@ const title = vehicle ? vehicleTitle(vehicle) : labels.detail.not_found_heading;
         basePath={cfg.basePath}
         stub={bbError?.stub}
         phone={BILBOOST.phone}
+        class="tilstand"
+        linkClass="btn btn-primary"
       />
     </div></section>
   ) : (
     <>
-      <section class="section" data-section="bil-hero">
-        <div class="container-site bil">
-          <a href={`${cfg.basePath}/`} class="bil__tilbage">{labels.detail.back}</a>
-          <BbVehicleGallery vehicle={vehicle} class="bil__galleri" buttonClass={BILBOOST.classes.secondaryButton} />
-          <div class="bil__side">
-            <h1 class="bil__titel">{vehicleTitle(vehicle)} <BbStatusBadge vehicle={vehicle} class="bil__badge" /></h1>
-            <BbPrice vehicle={vehicle} class="bil__pris" />
-            <BbVehicleFacts vehicle={vehicle} class="bil__fakta" />
+      <section class="section bil-top" data-section="bil-hero">
+        <div class="container-site">
+          <nav class="brodkrumme" aria-label="Brødkrumme">
+            <a href={`${cfg.basePath}/`} class="brodkrumme__tilbage">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+              Alle biler
+            </a>
+            <span aria-hidden="true">|</span>
+            <span>{vehicle.make}</span>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{vehicle.model}</span>
+          </nav>
+
+          <div class="bil">
+            <BbVehicleGallery vehicle={vehicle} class="bil__galleri" buttonClass="lightbox-knap" />
+
+            <aside class="bil__side" aria-label="Pris og kontakt">
+              <div class="bil__kort">
+                <BbStatusBadge vehicle={vehicle} class="bil__badge" />
+                <h1 class="bil__titel">
+                  {vehicle.make} {vehicle.model}{vehicle.variant && " "}
+                  {vehicle.variant && <span class="bil__variant">{vehicle.variant}</span>}
+                </h1>
+                {keyFacts.length > 0 && (
+                  <dl class="bil__nogletal">
+                    {keyFacts.map((f) => (
+                      <div><dt>{f.label}</dt><dd>{f.value}</dd></div>
+                    ))}
+                  </dl>
+                )}
+                <div class="bil__prisblok">
+                  <p class="bil__pris-label">Pris</p>
+                  <BbPrice vehicle={vehicle} class="bil__pris" />
+                </div>
+                <div class="bil__knapper">
+                  <a href="#henvendelse" class="btn btn-primary btn-lg" data-emne="proevetur">Book en prøvetur</a>
+                  <a href="#henvendelse" class="btn btn-secondary btn-lg" data-emne="spoergsmaal">Skriv om bilen</a>
+                  <a href={`tel:${tel}`} class="btn btn-secondary btn-lg"><Fragment set:html={phoneIcon} /> Ring {BILBOOST.phone}</a>
+                </div>
+              </div>
+
+              {dealer && (
+                <div class="forhandler">
+                  <p class="forhandler__navn">{dealer.name}</p>
+                  <ul class="forhandler__liste">
+                    {dealer.address && (
+                      <li>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><path d="M12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"></path></svg>
+                        <span>{dealer.address}</span>
+                      </li>
+                    )}
+                    {dealer.phone && (
+                      <li><Fragment set:html={phoneIcon} /><a href={`tel:${dealer.phone.replace(/\s+/g, "")}`}>{dealer.phone}</a></li>
+                    )}
+                    {dealer.email && (
+                      <li>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3.5 6.5 8.5 6.5 8.5-6.5"></path></svg>
+                        <a href={`mailto:${dealer.email}`}>{dealer.email}</a>
+                      </li>
+                    )}
+                    <li>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M4 17v-4l2-5h12l2 5v4"></path><path d="M4 13h16"></path></svg>
+                      <a href={`${cfg.basePath}/`}>Se alle biler til salg</a>
+                    </li>
+                  </ul>
+                  {dealer.cvr && <p class="forhandler__cvr">CVR-nr.: {dealer.cvr}</p>}
+                </div>
+              )}
+            </aside>
+
+            <div class="bil__info">
+              {vehicle.description && (
+                <div class="bil__beskrivelse">
+                  <h2>{labels.detail.description}</h2>
+                  <p>{vehicle.description}</p>
+                </div>
+              )}
+              <BbVehicleFacts vehicle={vehicle} class="bil__fakta" />
+            </div>
           </div>
         </div>
       </section>
 
-      {vehicle.description && (
-        <section class="section" data-section="bil-beskrivelse"><div class="container-site measure">
-          <h2>{labels.detail.description}</h2>
-          <p class="bil__beskrivelse">{vehicle.description}</p>
-        </div></section>
+      {vehicle.equipment.length > 0 && (
+        <section class="section section--hvid" data-section="bil-udstyr">
+          <div class="container-site">
+            <BbEquipment vehicle={vehicle} class="bil__udstyr" />
+          </div>
+        </section>
       )}
 
-      <section class="section" data-section="bil-udstyr"><div class="container-site">
-        <BbEquipment vehicle={vehicle} class="bil__udstyr" />
-      </div></section>
-
-      <section class="section" data-section="bil-henvendelse"><div class="container-site">
-        <BbInquiryForm
-          vehicle={vehicle}
-          apiBase={cfg.apiBase}
-          siteKey={cfg.siteKey}
-          turnstileSiteKey={PUBLIC_TURNSTILE_SITE_KEY}
-          phone={BILBOOST.phone}
-          labels={labels.inquiry}
-          class="bil__formular"
-          fieldClass={BILBOOST.classes.field}
-          inputClass={BILBOOST.classes.input}
-          buttonClass={BILBOOST.classes.button}
-          secondaryButtonClass={BILBOOST.classes.secondaryButton}
-        />
-      </div></section>
+      <section id="henvendelse" class="section" data-section="bil-henvendelse">
+        <div class="container-site henvendelse">
+          <BbInquiryForm
+            vehicle={vehicle}
+            apiBase={cfg.apiBase}
+            siteKey={cfg.siteKey}
+            turnstileSiteKey={PUBLIC_TURNSTILE_SITE_KEY}
+            phone={BILBOOST.phone}
+            labels={labels.inquiry}
+            class="bil__formular"
+            fieldClass={BILBOOST.classes.field}
+            inputClass={BILBOOST.classes.input}
+            buttonClass={BILBOOST.classes.button}
+            secondaryButtonClass={BILBOOST.classes.secondaryButton}
+          />
+          <aside class="henvendelse__side" aria-label="Bilen du skriver om">
+            <div class="minikort">
+              {vehicle.images[0] && <BbImage image={vehicle.images[0]} sizes="(min-width: 1024px) 420px, 120px" preferredWidth={640} />}
+              <div class="minikort__tekst">
+                <p class="minikort__titel">{vehicle.make} {vehicle.model}</p>
+                {vehicle.variant && <p class="minikort__variant">{vehicle.variant}</p>}
+                <BbPrice vehicle={vehicle} showDelivery={false} class="minikort__pris" />
+              </div>
+            </div>
+            <div class="henvendelse__ring">
+              <p class="henvendelse__ring-titel">Foretrækker du at ringe?</p>
+              <p>Vi tager gerne en snak om bilen, en prøvetur eller finansiering.</p>
+              <a href={`tel:${tel}`} class="btn btn-primary"><Fragment set:html={phoneIcon} /> Ring {BILBOOST.phone}</a>
+            </div>
+          </aside>
+        </div>
+      </section>
 
       {related.length > 0 && (
-        <section class="section" data-section="bil-lignende"><div class="container-site">
+        <section class="section section--hvid" data-section="bil-lignende"><div class="container-site bil-lignende">
           <h2>{labels.detail.similar}</h2>
-          <BbRail label="bil" buttonClass={BILBOOST.classes.secondaryButton}>
+          <BbRail label="bil" buttonClass="rail-knap">
             <BbVehicleList vehicles={related} basePath={cfg.basePath} listClass="bilsalg__liste">
               <fragment slot="card">{(v, ctx) => <BilKort vehicle={v} ctx={ctx} />}</fragment>
             </BbVehicleList>
@@ -131,7 +230,42 @@ const title = vehicle ? vehicleTitle(vehicle) : labels.detail.not_found_heading;
         </div></section>
       )}
 
-      <BbJsonLd vehicle={vehicle} siteUrl={cfg.siteUrl} basePath={cfg.basePath} dealer={getLastDealer()} />
+      <div class="handlingsbar" data-handlingsbar>
+        <BbPrice vehicle={vehicle} showDelivery={false} class="handlingsbar__pris" />
+        <a href={`tel:${tel}`} class="btn btn-secondary" aria-label={`Ring ${BILBOOST.phone}`}><Fragment set:html={phoneIcon} /> Ring</a>
+        <a href="#henvendelse" class="btn btn-primary" data-emne="proevetur">Book prøvetur</a>
+      </div>
+
+      <BbJsonLd vehicle={vehicle} siteUrl={cfg.siteUrl} basePath={cfg.basePath} dealer={dealer} />
     </>
   )}
 </Layout>
+
+<script>
+  // "Book en prøvetur" and "Skriv om bilen" jump to the form with the matching topic already chosen.
+  document.querySelectorAll<HTMLAnchorElement>("[data-emne]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const radio = document.querySelector<HTMLInputElement>(`form[data-bb="inquiry"] input[name="topic"][value="${link.dataset.emne}"]`);
+      if (radio && !radio.checked) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event("input", { bubbles: true }));
+        radio.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+  });
+
+  // The phone action bar gives way while the form or the footer is on screen.
+  const bar = document.querySelector<HTMLElement>("[data-handlingsbar]");
+  const targets = [document.getElementById("henvendelse"), document.querySelector("footer")].filter((el): el is HTMLElement => el !== null);
+  if (bar && "IntersectionObserver" in window) {
+    const seen = new Set<Element>();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) seen.add(e.target);
+        else seen.delete(e.target);
+      }
+      bar.classList.toggle("handlingsbar--skjult", seen.size > 0);
+    }, { rootMargin: "0px 0px -20% 0px" });
+    targets.forEach((el) => io.observe(el));
+  }
+</script>

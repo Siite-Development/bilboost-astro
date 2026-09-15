@@ -7,7 +7,7 @@
  * thumbnails stand as they are.
  */
 
-type Slide = { srcset: string; src: string; alt: string };
+type Slide = { srcset: string; src: string; alt: string; rotate: string };
 
 const lock = (() => {
   let y = 0;
@@ -46,7 +46,12 @@ const init = (gallery: HTMLElement) => {
 
   const slides: Slide[] = buttons.map((b) => {
     const thumb = b.querySelector("img");
-    return { srcset: thumb?.getAttribute("srcset") ?? "", src: thumb?.currentSrc || thumb?.src || "", alt: thumb?.alt ?? "" };
+    return {
+      srcset: thumb?.getAttribute("srcset") ?? "",
+      src: thumb?.currentSrc || thumb?.src || "",
+      alt: thumb?.alt ?? "",
+      rotate: b.dataset.bbRotate ?? "",
+    };
   });
   const sizes = dialog.dataset.bbSizes ?? "min(92vw, 1400px)";
   let index = 0;
@@ -59,6 +64,8 @@ const init = (gallery: HTMLElement) => {
     img.sizes = sizes;
     img.src = s.src;
     img.alt = s.alt;
+    if (s.rotate) img.dataset.bbRotate = s.rotate;
+    else delete img.dataset.bbRotate;
     if (caption) caption.textContent = s.alt;
     if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
   };

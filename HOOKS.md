@@ -42,6 +42,7 @@ attribute selectors. Both work; pick one per site.
 | `data-bb="facts"` | `<section>`; `facts-heading`, `facts-list` (`<dl>`), `fact` (`<div>` with `<dt><dd>`) |
 | `data-bb="equipment"` | `<section>`; `equipment-heading`, `equipment-list` (`<ul>`) |
 | `data-bb="image"` | `<span>` around a responsive `<img>` |
+| `data-bb-rotate="90\|180\|270"` | on an image's frame (`image` span, `gallery-open` button) and on `lightbox-image`: the photo was turned upright in BilBoost. `styles/base.css` turns it; a site rule that sets the `img`'s `width`/`height`/`transform` must leave rotated frames alone (0.1.2) |
 | `data-bb="unavailable"` `data-bb-variant="sold\|not_found\|unavailable"` | `unavailable-heading` (`<h1>`), `-body`, `-link` |
 
 ## Rail (mobile card rail)

@@ -28,7 +28,7 @@ const hero = images[0] ? imageAttrs(images[0], SIZES.hero, 1024) : null;
 
 <div data-bb="gallery" class={className} data-bb-count={images.length}>
   {hero ? (
-    <button type="button" data-bb="gallery-open" data-bb-index="0" class:list={["bb-gallery-hero", heroClass]} aria-label={t(labels.open, { alt: hero.alt })}>
+    <button type="button" data-bb="gallery-open" data-bb-index="0" data-bb-rotate={hero.rotate} class:list={["bb-gallery-hero", heroClass]} aria-label={t(labels.open, { alt: hero.alt })}>
       <img src={hero.src} srcset={hero.srcset} sizes={hero.sizes} width={hero.width} height={hero.height} alt={hero.alt} loading="eager" fetchpriority="high" decoding="async" />
     </button>
   ) : (
@@ -41,7 +41,7 @@ const hero = images[0] ? imageAttrs(images[0], SIZES.hero, 1024) : null;
         const a = imageAttrs(image, SIZES.thumb, 320);
         return (
           <li>
-            <button type="button" data-bb="gallery-open" data-bb-index={i + 1} aria-label={t(labels.open, { alt: a.alt })}>
+            <button type="button" data-bb="gallery-open" data-bb-index={i + 1} data-bb-rotate={a.rotate} aria-label={t(labels.open, { alt: a.alt })}>
               <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width} height={a.height} alt={a.alt} loading="lazy" decoding="async" />
             </button>
           </li>

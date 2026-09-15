@@ -22,6 +22,11 @@ export type ImageAttrs = {
   width: number;
   height: number;
   alt: string;
+  /**
+   * Degrees to turn the photo back upright, `undefined` when it needs none.
+   * Rendered as `data-bb-rotate` on the image's frame; `styles/base.css` turns it.
+   */
+  rotate: "90" | "180" | "270" | undefined;
 };
 
 export const imageAttrs = (image: PublicImage, sizes: string, preferredWidth = 640): ImageAttrs => {
@@ -34,6 +39,7 @@ export const imageAttrs = (image: PublicImage, sizes: string, preferredWidth = 6
     width: pick.width,
     height: Math.round(pick.width / IMAGE_RATIO),
     alt: image.alt,
+    rotate: image.rotation ? (String(image.rotation) as ImageAttrs["rotate"]) : undefined,
   };
 };
 

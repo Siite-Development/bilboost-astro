@@ -1,4 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
 ---
-<Layout title="Tak for din henvendelse"><section class="section"><div class="container-site"><h1>Tak for din henvendelse</h1><p>Vi vender tilbage hurtigst muligt.</p></div></section></Layout>
+
+<Layout title="Tak for din henvendelse">
+  <section class="tak">
+    <div class="container-site">
+      <div class="tak__kort">
+        <h1>Tak for din henvendelse</h1>
+        <p>Vi har modtaget den og vender tilbage hurtigst muligt.</p>
+        <a href="/bilsalg/" class="btn btn-primary">Tilbage til bilerne</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .tak { padding: clamp(3rem, 10vw, 6rem) 0; }
+  .tak__kort { display: grid; justify-items: center; gap: 1rem; max-width: 34rem; margin: 0 auto; padding: 3rem 1.5rem; text-align: center; background: var(--surface-card); border: 1px solid var(--line); border-radius: var(--radius); }
+  .tak__kort p { color: var(--ink-muted); }
+</style>

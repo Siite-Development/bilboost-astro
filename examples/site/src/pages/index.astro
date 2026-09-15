@@ -1,4 +1,29 @@
 ---
+/** Stand-in front page: one search that lands on the car list with `?q=`. */
 import Layout from "../layouts/Layout.astro";
 ---
-<Layout title="Forside"><section class="section"><div class="container-site"><h1>Demo Biler</h1><p><a href="/bilsalg/">Se bilerne</a></p></div></section></Layout>
+
+<Layout title="Forside">
+  <section class="forside">
+    <div class="container-site forside__inner">
+      <h1>Find din næste bil</h1>
+      <p class="forside__intro">Alle biler på lager hos Demo Biler, opdateret automatisk.</p>
+      <form action="/bilsalg/" method="get" class="forside__sog" role="search">
+        <label for="forside-q" class="forside__label">Søg efter bil</label>
+        <input id="forside-q" name="q" type="search" class="input" placeholder="Søg på mærke, model eller udstyr" autocomplete="off" />
+        <button class="btn btn-primary btn-lg" type="submit">Søg</button>
+      </form>
+      <a href="/bilsalg/" class="forside__alle">Se alle biler</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .forside { padding: clamp(3rem, 10vw, 7rem) 0; background: var(--surface-card); border-bottom: 1px solid var(--line); }
+  .forside__inner { display: grid; justify-items: center; gap: 1rem; text-align: center; }
+  .forside__intro { color: var(--ink-muted); font-size: var(--text-md); }
+  .forside__sog { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; width: 100%; max-width: 40rem; margin-top: 1rem; }
+  .forside__sog .input { min-height: 54px; font-size: var(--text-md); }
+  .forside__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .forside__alle { font-weight: 700; text-decoration: none; }
+</style>

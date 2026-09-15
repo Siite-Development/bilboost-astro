@@ -3,6 +3,19 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.2 — 2026-09-15
+
+- Sideways feed photos can be turned upright in BilBoost ("Drej billede"). The
+  contract carries it as an optional `rotation` (90/180/270) on a
+  `PublicImage`, additive to v1. `BbImage`, the gallery hero and thumbnails
+  get `data-bb-rotate` on their frame, the lightbox image gets it too, and
+  `styles/base.css` turns them while still covering the 4:3 frame. Auto IT
+  delivers some photos with the pixels rotated and no EXIF orientation, so
+  nothing in the file could do this automatically.
+- `*.localhost` is a devsite host by default (never cached, `noindex`). The
+  house dev URL is `<slug>.localhost:4400`, and car pages there were cached
+  for five minutes, so a car edit on BilBoost dev looked like it did nothing.
+
 ## 0.1.1 — 2026-09-14
 
 - The advertised price is the TOTAL including mandatory delivery costs, as

@@ -15,6 +15,7 @@ export const BILBOOST = {
   /** Label overrides; see `bilboost-astro/labels` for every key. */
   labels: {
     list: { heading: "Brugte biler til salg" },
+    filters: { search_placeholder: "Søg mærke eller model" },
     inquiry: { intro: "Vi svarer typisk samme dag. Ring gerne, hvis det haster." },
   },
   /** Tailwind-style class maps for the package components (optional). */

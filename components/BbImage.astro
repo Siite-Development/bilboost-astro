@@ -18,7 +18,7 @@ const { image, sizes = SIZES.card, eager = false, preferredWidth = 640, class: c
 const attrs = imageAttrs(image, sizes, preferredWidth);
 ---
 
-<span data-bb="image" class={className}>
+<span data-bb="image" class={className} data-bb-rotate={attrs.rotate}>
   <img
     src={attrs.src}
     srcset={attrs.srcset}

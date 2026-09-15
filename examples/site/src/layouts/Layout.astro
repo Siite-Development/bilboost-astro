@@ -1,20 +1,57 @@
 ---
 /** Stand-in for a Siite site's own layout: head, header, footer. */
 import "../styles/tokens.css";
-interface Props { title: string; canonical?: string }
-const { title, canonical } = Astro.props;
+import { SITE } from "../config/site.mjs";
+
+interface Props {
+  title: string;
+  canonical?: string;
+  bodyClass?: string;
+}
+const { title, canonical, bodyClass } = Astro.props;
+const tel = SITE.phone.replace(/\s+/g, "");
+const path = Astro.url.pathname;
 ---
+
 <!doctype html>
 <html lang="da">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} | Demo Biler</title>
+    <meta name="theme-color" content="#ffffff" />
+    <title>{title} | {SITE.name}</title>
     {canonical && <link rel="canonical" href={canonical} />}
   </head>
-  <body>
-    <header class="site-header"><div class="container-site"><a href="/">Demo Biler</a> · <a href="/bilsalg/">Bilsalg</a></div></header>
-    <main><slot /></main>
-    <footer class="site-footer"><div class="container-site"><p>© {new Date().getFullYear()} | Demo Biler</p></div></footer>
+  <body class={bodyClass}>
+    <a class="skip" href="#indhold">Spring til indhold</a>
+    <header class="site-header">
+      <div class="container-site site-header__inner">
+        <a href="/" class="site-logo">
+          <span class="site-logo__mark" aria-hidden="true">DB</span>
+          <span>{SITE.name}</span>
+        </a>
+        <nav class="site-nav" aria-label="Hovedmenu">
+          <a href="/" aria-current={path === "/" ? "page" : undefined}>Forside</a>
+          <a href="/bilsalg/" aria-current={path.startsWith("/bilsalg") ? "page" : undefined}>Bilsalg</a>
+        </nav>
+        <a href={`tel:${tel}`} class="btn btn-primary site-header__phone" aria-label={`Ring til ${SITE.name} på ${SITE.phone}`}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>
+          <span class="site-header__phone-text">{SITE.phone}</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="indhold"><slot /></main>
+
+    <footer class="site-footer">
+      <div class="container-site site-footer__inner">
+        <div>
+          <p><strong>{SITE.name}</strong></p>
+          <p>Eksempelsite til bilmodulet fra BilBoost.</p>
+        </div>
+        <a href={`tel:${tel}`}>{SITE.phone}</a>
+        <p class="site-footer__copy">© {new Date().getFullYear()} | {SITE.name}</p>
+      </div>
+    </footer>
   </body>
 </html>

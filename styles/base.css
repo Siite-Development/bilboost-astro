@@ -104,6 +104,55 @@ form[data-bb="inquiry"] [data-bb="inquiry-turnstile"]:empty {
   object-fit: cover;
 }
 
+/*
+ * A feed photo turned in BilBoost (`data-bb-rotate` on its frame). A quarter
+ * turn swaps width and height, so the image is sized in container units of the
+ * frame and rotated about its centre: it still covers the 4:3 frame exactly.
+ */
+[data-bb-rotate] {
+  position: relative;
+  overflow: hidden;
+  container-type: size;
+}
+[data-bb="image"][data-bb-rotate],
+button[data-bb="gallery-open"][data-bb-rotate] {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+[data-bb-rotate="90"] > img,
+[data-bb-rotate="270"] > img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100cqh !important;
+  height: 100cqw !important;
+  max-width: none;
+  aspect-ratio: auto;
+  object-fit: cover;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+[data-bb-rotate="270"] > img {
+  transform: translate(-50%, -50%) rotate(270deg);
+}
+[data-bb-rotate="180"] > img {
+  transform: rotate(180deg);
+}
+/* The lightbox image has no frame: turn the image itself inside a square box. */
+dialog[data-bb="lightbox"] img[data-bb-rotate="90"],
+dialog[data-bb="lightbox"] img[data-bb-rotate="270"] {
+  max-width: min(72dvh, 90vw);
+  max-height: min(72dvh, 90vw);
+  margin-block: calc(min(72dvh, 90vw) * 0.125);
+  transform: rotate(90deg);
+}
+dialog[data-bb="lightbox"] img[data-bb-rotate="270"] {
+  transform: rotate(270deg);
+}
+dialog[data-bb="lightbox"] img[data-bb-rotate="180"] {
+  transform: rotate(180deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-bb="rail-progress"] {
     transition: none;

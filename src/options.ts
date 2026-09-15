@@ -22,7 +22,8 @@ export type BilboostOptions = {
 
 export type ResolvedOptions = Required<BilboostOptions>;
 
-export const DEFAULT_DEVSITE_HOSTS = [".workers.dev", ".devsiite.dk", "localhost", "127.0.0.1"];
+/** `.localhost` covers `<slug>.localhost:4400`, the house's per-repo dev URL (0.1.2). */
+export const DEFAULT_DEVSITE_HOSTS = [".workers.dev", ".devsiite.dk", "localhost", ".localhost", "127.0.0.1"];
 
 export const resolveOptions = (input: BilboostOptions): ResolvedOptions => {
   if (!/^[a-z0-9-]{3,40}$/.test(input.siteKey)) {

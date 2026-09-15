@@ -30,7 +30,9 @@ export const SPEC_KEYS = [
 export type SpecKey = (typeof SPEC_KEYS)[number];
 
 export type ImageVariant = { width: number; url: string };
-export type PublicImage = { alt: string; variants: ImageVariant[] };
+/** `rotation` is set only when a person turned a sideways feed photo in BilBoost (additive, 0.1.2). */
+export type ImageRotation = 90 | 180 | 270;
+export type PublicImage = { alt: string; variants: ImageVariant[]; rotation?: ImageRotation };
 
 export type PublicVehicle = {
   id: string;
