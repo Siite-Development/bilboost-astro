@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import type { AstroIntegration } from "astro";
 import { envField } from "astro/config";
 import { resolveOptions, type BilboostOptions } from "./options.ts";
+import { checkKeepVars, KEEP_VARS_HELP } from "./wranglerGuard.ts";
 
 /**
  * `bilboost()` in `astro.config.mjs`:
@@ -83,7 +84,17 @@ const bilboost = (input: BilboostOptions): AstroIntegration => {
   return {
     name: "bilboost-astro",
     hooks: {
-      "astro:config:setup": ({ config, injectRoute, addMiddleware, updateConfig, logger }) => {
+      "astro:config:setup": ({ config, command, injectRoute, addMiddleware, updateConfig, logger }) => {
+        // A git build deletes dashboard keys unless the repo says keep_vars
+        // (src/wranglerGuard.ts). Fail the build so it can never ship without
+        // it, from any machine or from Cloudflare's own build; warn in dev.
+        const keepVars = checkKeepVars(config.root);
+        if (!keepVars.ok) {
+          const message = `${keepVars.reason}. ${KEEP_VARS_HELP}`;
+          if (command === "build") throw new Error(`bilboost-astro: ${message}`);
+          logger.warn(message);
+        }
+
         // Under `trailingSlash: "always"` (the house default) an extensionless
         // route only matches WITH the slash, and the bare URL 301s to it.
         // BilBoost's push follows that redirect (`sendPush`), so either

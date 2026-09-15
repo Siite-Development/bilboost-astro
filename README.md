@@ -69,7 +69,8 @@ Secrets are set by a person in the Cloudflare dashboard, never committed:
 
 Add them with type **Secret**, not "Text". A plain-text variable that is not
 under `[vars]` is deleted by the next git build, and every car page answers
-500 (Monzes Auto, 15 Sep 2026). `keep_vars = true` is the second guard.
+500 (Monzes Auto, 15 Sep 2026). `keep_vars = true` is the second guard, and
+from 0.1.4 `astro build` fails without it (`src/wranglerGuard.ts`).
 
 Then copy the five files from `examples/site/` into the site and restyle:
 

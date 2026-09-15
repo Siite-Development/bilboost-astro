@@ -3,6 +3,14 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.4 — 2026-09-15
+
+- `astro build` now fails when the site's `wrangler.toml` (or `wrangler.jsonc`,
+  `wrangler.json`) lacks top-level `keep_vars = true`, and `astro dev` warns.
+  Without it every Cloudflare git build deletes the BilBoost keys set in the
+  dashboard, and the car pages answer 500 (Monzes Auto, 15 Sep 2026). A site
+  upgrading must add the line before its next build.
+
 ## 0.1.3 — 2026-09-15
 
 - The gallery's thumbnail strip shows at most `maxThumbs` thumbnails (default 4).
