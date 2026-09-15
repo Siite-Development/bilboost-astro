@@ -3,6 +3,14 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.6 — 2026-09-15
+
+- A turned photo opens in the lightbox again. The frame rule
+  `[data-bb-rotate]` also matched the lightbox image, which carries the
+  attribute itself, and `container-type: size` on an `<img>` shrinks it to
+  0 x 0, so the dialog opened empty. The rule is now
+  `[data-bb-rotate]:not(img)`.
+
 ## 0.1.5 — 2026-09-15
 
 - A photo turned in BilBoost now keeps its turn when a site scales the image

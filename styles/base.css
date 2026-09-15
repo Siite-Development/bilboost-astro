@@ -135,7 +135,10 @@ form[data-bb="inquiry"] [data-bb="inquiry-turnstile"]:empty {
  * instead of replacing it. With `transform` the hover wiped the turn and its
  * transition animated a half rotation (Monzes Auto, 15 Sep 2026).
  */
-[data-bb-rotate] {
+/* Frames only. The lightbox image carries `data-bb-rotate` itself, and
+ * `container-type: size` on an <img> drops its intrinsic size to 0 x 0, so a
+ * turned photo opened an empty lightbox (Monzes Auto, 15 Sep 2026). */
+[data-bb-rotate]:not(img) {
   position: relative;
   overflow: hidden;
   container-type: size;
