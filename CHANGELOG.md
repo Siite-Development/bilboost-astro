@@ -3,6 +3,14 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.5 — 2026-09-15
+
+- A photo turned in BilBoost now keeps its turn when a site scales the image
+  on hover. `styles/base.css` turns it with the individual `translate` and
+  `rotate` properties instead of `transform`, so a site rule like
+  `.card:hover img { transform: scale(1.03) }` adds to the turn. Before, the
+  hover replaced it and the transition animated a half rotation.
+
 ## 0.1.4 — 2026-09-15
 
 - `astro build` now fails when the site's `wrangler.toml` (or `wrangler.jsonc`,

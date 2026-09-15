@@ -129,6 +129,11 @@ form[data-bb="inquiry"] [data-bb="inquiry-turnstile"]:empty {
  * A feed photo turned in BilBoost (`data-bb-rotate` on its frame). A quarter
  * turn swaps width and height, so the image is sized in container units of the
  * frame and rotated about its centre: it still covers the 4:3 frame exactly.
+ *
+ * The turn uses the individual `translate` and `rotate` properties, never
+ * `transform`, so a site's own hover (`transform: scale(1.03)`) adds to it
+ * instead of replacing it. With `transform` the hover wiped the turn and its
+ * transition animated a half rotation (Monzes Auto, 15 Sep 2026).
  */
 [data-bb-rotate] {
   position: relative;
@@ -151,13 +156,14 @@ button[data-bb="gallery-open"][data-bb-rotate] {
   max-width: none;
   aspect-ratio: auto;
   object-fit: cover;
-  transform: translate(-50%, -50%) rotate(90deg);
+  translate: -50% -50%;
+  rotate: 90deg;
 }
 [data-bb-rotate="270"] > img {
-  transform: translate(-50%, -50%) rotate(270deg);
+  rotate: 270deg;
 }
 [data-bb-rotate="180"] > img {
-  transform: rotate(180deg);
+  rotate: 180deg;
 }
 /* The lightbox image has no frame: turn the image itself inside a square box. */
 dialog[data-bb="lightbox"] img[data-bb-rotate="90"],
@@ -165,13 +171,13 @@ dialog[data-bb="lightbox"] img[data-bb-rotate="270"] {
   max-width: min(72dvh, 90vw);
   max-height: min(72dvh, 90vw);
   margin-block: calc(min(72dvh, 90vw) * 0.125);
-  transform: rotate(90deg);
+  rotate: 90deg;
 }
 dialog[data-bb="lightbox"] img[data-bb-rotate="270"] {
-  transform: rotate(270deg);
+  rotate: 270deg;
 }
 dialog[data-bb="lightbox"] img[data-bb-rotate="180"] {
-  transform: rotate(180deg);
+  rotate: 180deg;
 }
 
 @media (prefers-reduced-motion: reduce) {
