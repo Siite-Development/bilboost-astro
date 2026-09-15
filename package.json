@@ -1,6 +1,6 @@
 {
   "name": "bilboost-astro",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": false,
   "description": "BilBoost cars on a dealer's Astro site: live loader, edge cache, signed revalidate, inquiry form. Behaviour lives here; the site owns the look.",
   "type": "module",

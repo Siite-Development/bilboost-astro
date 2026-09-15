@@ -11,15 +11,18 @@ export type RuntimeConfig = ResolvedOptions & {
   apiBase: string;
   readToken: string;
   webhookSecrets: string[];
+  /** `PUBLIC_TURNSTILE_SITE_KEY`, reported (never its value) by the health route. */
+  turnstileSiteKey?: string | null;
 };
 
 let cached: Promise<RuntimeConfig> | null = null;
 
 export const getConfig = (): Promise<RuntimeConfig> => {
   cached ??= (async () => {
-    const [{ default: options }, env] = await Promise.all([
+    const [{ default: options }, env, clientEnv] = await Promise.all([
       import("virtual:bilboost/options"),
       import("astro:env/server"),
+      import("astro:env/client"),
     ]);
     const apiBase = (env.BILBOOST_API_BASE ?? "").replace(/\/+$/, "");
     if (!apiBase) throw new Error("BILBOOST_API_BASE mangler");
@@ -31,6 +34,7 @@ export const getConfig = (): Promise<RuntimeConfig> => {
       webhookSecrets: [env.BILBOOST_WEBHOOK_SECRET, env.BILBOOST_WEBHOOK_SECRET_NEXT].filter(
         (s): s is string => !!s,
       ),
+      turnstileSiteKey: clientEnv.PUBLIC_TURNSTILE_SITE_KEY ?? null,
     };
   })();
   return cached;

@@ -3,6 +3,14 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.7 — 2026-09-15
+
+- `GET /api/bilboost/health` reports `turnstile: "set" | "test" | "missing"`
+  for `PUBLIC_TURNSTILE_SITE_KEY` (never the key itself). BilBoost's "Test
+  forbindelse" shows it next to its own check of the Turnstile secret, so a
+  site still on Cloudflare's test key ("Kun til test") fails the test.
+  Additive to the health response.
+
 ## 0.1.6 — 2026-09-15
 
 - A turned photo opens in the lightbox again. The frame rule
