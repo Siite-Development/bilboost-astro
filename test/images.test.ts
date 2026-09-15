@@ -1,5 +1,17 @@
 import { describe, expect, test } from "vitest";
-import { imageAttrs, SIZES } from "../src/images.ts";
+import { imageAttrs, SIZES, thumbWindow } from "../src/images.ts";
+
+describe("thumbWindow", () => {
+  test("shows up to the max and counts the rest for the +N", () => {
+    expect(thumbWindow(10, 4)).toEqual({ visible: 4, rest: 6 });
+    expect(thumbWindow(4, 4)).toEqual({ visible: 4, rest: 0 });
+    expect(thumbWindow(2, 4)).toEqual({ visible: 2, rest: 0 });
+    expect(thumbWindow(0, 4)).toEqual({ visible: 0, rest: 0 });
+  });
+  test("a nonsense max still shows one", () => {
+    expect(thumbWindow(5, 0)).toEqual({ visible: 1, rest: 4 });
+  });
+});
 
 const image = {
   alt: "Fiat Punto",

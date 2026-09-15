@@ -3,6 +3,14 @@
 All notable changes. Versions follow the rules in HOOKS.md ("What a version
 bump may change").
 
+## 0.1.3 — 2026-09-15
+
+- The gallery's thumbnail strip shows at most `maxThumbs` thumbnails (default 4).
+  When a car has more photos, the last visible thumbnail carries "+N" (hook
+  `data-bb="gallery-more"`) and opens the lightbox there; the rest stay in the
+  markup, `hidden`, so the lightbox still steps through every photo. A site
+  that showed five thumbnails in a row should now size its strip for four.
+
 ## 0.1.2 — 2026-09-15
 
 - Sideways feed photos can be turned upright in BilBoost ("Drej billede"). The

@@ -43,5 +43,16 @@ export const imageAttrs = (image: PublicImage, sizes: string, preferredWidth = 6
   };
 };
 
+/**
+ * How many thumbnails the gallery strip shows, and how many it hides behind the
+ * "+N" on the last one (0.1.3). Hidden thumbnails stay in the markup so the
+ * lightbox still steps through every photo.
+ */
+export const thumbWindow = (thumbCount: number, maxThumbs: number): { visible: number; rest: number } => {
+  const max = Math.max(1, Math.floor(maxThumbs));
+  const visible = Math.min(thumbCount, max);
+  return { visible, rest: Math.max(0, thumbCount - visible) };
+};
+
 export const largestUrl = (image: PublicImage): string =>
   [...image.variants].sort((a, b) => b.width - a.width)[0]?.url ?? "";

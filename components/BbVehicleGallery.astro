@@ -5,10 +5,14 @@
  * with the alt text in their label. Without JavaScript the buttons do
  * nothing and the pictures stand as they are — never `<a href>` to the raw
  * file.
+ *
+ * The strip shows at most `maxThumbs` thumbnails (default 4). When there are
+ * more, the last visible one carries "+N" and the rest stay in the markup,
+ * hidden, so the lightbox still steps through every photo (0.1.3).
  */
 import type { PublicVehicle } from "../src/contract.ts";
 import { vehicleTitle } from "../src/format.ts";
-import { imageAttrs, SIZES } from "../src/images.ts";
+import { imageAttrs, SIZES, thumbWindow } from "../src/images.ts";
 import { LABELS, t } from "../src/labels.da.ts";
 
 interface Props {
@@ -19,11 +23,14 @@ interface Props {
   thumbsClass?: string;
   dialogClass?: string;
   buttonClass?: string;
+  maxThumbs?: number;
 }
-const { vehicle, labels = LABELS.gallery, class: className, heroClass, thumbsClass, dialogClass, buttonClass } = Astro.props;
+const { vehicle, labels = LABELS.gallery, class: className, heroClass, thumbsClass, dialogClass, buttonClass, maxThumbs = 4 } = Astro.props;
 const title = vehicleTitle(vehicle);
 const images = vehicle.images;
 const hero = images[0] ? imageAttrs(images[0], SIZES.hero, 1024) : null;
+const thumbs = images.slice(1);
+const { visible, rest } = thumbWindow(thumbs.length, maxThumbs);
 ---
 
 <div data-bb="gallery" class={className} data-bb-count={images.length}>
@@ -35,14 +42,17 @@ const hero = images[0] ? imageAttrs(images[0], SIZES.hero, 1024) : null;
     <p data-bb="gallery-empty">{labels.none}</p>
   )}
 
-  {images.length > 1 && (
+  {thumbs.length > 0 && (
     <ul data-bb="gallery-thumbs" class={thumbsClass}>
-      {images.slice(1).map((image, i) => {
+      {thumbs.map((image, i) => {
         const a = imageAttrs(image, SIZES.thumb, 320);
+        const isMore = rest > 0 && i === visible - 1;
+        const label = isMore ? t(labels.more, { n: String(images.length) }) : t(labels.open, { alt: a.alt });
         return (
-          <li>
-            <button type="button" data-bb="gallery-open" data-bb-index={i + 1} data-bb-rotate={a.rotate} aria-label={t(labels.open, { alt: a.alt })}>
+          <li hidden={i >= visible}>
+            <button type="button" data-bb="gallery-open" data-bb-index={i + 1} data-bb-rotate={a.rotate} aria-label={label}>
               <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width} height={a.height} alt={a.alt} loading="lazy" decoding="async" />
+              {isMore && <span data-bb="gallery-more" aria-hidden="true">+{rest}</span>}
             </button>
           </li>
         );

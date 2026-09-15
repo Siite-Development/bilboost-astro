@@ -35,6 +35,7 @@ attribute selectors. Both work; pick one per site.
 | `data-bb="gallery-open"` `data-bb-index` | `<button>` around each photo |
 | `data-bb="gallery-thumbs"` | `<ul>` of the rest |
 | `data-bb="gallery-empty"` | no photos |
+| `data-bb="gallery-more"` | `<span>` "+N" on the last visible thumbnail when there are more than `maxThumbs` (default 4); scrim and text in `styles/base.css`. Thumbnails past the max are `<li hidden>` (0.1.3) |
 | `data-bb="lightbox"` | `<dialog>` — centred, `max-width: min(90vw, 62rem)`, image `max-height: 72dvh` (in `styles/base.css`) |
 | `data-bb="lightbox-panel"`, `-image`, `-bar`, `-prev`, `-next`, `-close`, `-counter`, `-caption` | inside the dialog |
 | `data-bb="price"` `data-bb-has-price="1\|0"` | `<span>`; inner `price-amount` (the advertised TOTAL incl. delivery), `price-delivery` ("heraf leveringsomkostninger …") |

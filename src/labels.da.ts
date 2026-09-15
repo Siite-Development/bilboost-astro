@@ -57,6 +57,8 @@ export const LABELS = {
     next: "Næste billede",
     counter: "{n} / {m}",
     none: "Der er ingen billeder af denne bil endnu.",
+    /** Label on the "+N" thumbnail (0.1.3). */
+    more: "Vis alle {n} billeder",
   },
   rail: { prev: "Forrige {label}", next: "Næste {label}" },
   inquiry: {

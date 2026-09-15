@@ -84,6 +84,27 @@ button[data-bb="gallery-open"] {
   border: 0;
   background: none;
 }
+/* Thumbnails past `maxThumbs` stay in the markup for the lightbox, never painted. */
+[data-bb="gallery-thumbs"] li[hidden] {
+  display: none !important;
+}
+[data-bb="gallery-thumbs"] button[data-bb="gallery-open"] {
+  position: relative;
+}
+/* "+N" on the last visible thumbnail: a dark scrim so white text reads on any photo. */
+[data-bb="gallery-more"] {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
+}
 
 /* ------------------------------------------------------------ inquiry */
 form[data-bb="inquiry"] [data-bb="inquiry-progress"][hidden],
