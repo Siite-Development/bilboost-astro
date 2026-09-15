@@ -55,6 +55,7 @@ binding = "ASSETS"
 
 [cache]
 enabled = true          # do NOT set cross_version_cache
+keep_vars = true   # a git build runs `wrangler deploy`, which otherwise deletes dashboard variables
 
 [vars]
 BILBOOST_API_BASE = "https://pastel-civet-419.eu-west-1.convex.site"   # copy from `npx convex deploy` output, region segment included
@@ -65,6 +66,10 @@ Secrets are set by a person in the Cloudflare dashboard, never committed:
 `BILBOOST_READ_TOKEN`, `BILBOOST_WEBHOOK_SECRET` (and
 `BILBOOST_WEBHOOK_SECRET_NEXT` during a rotation). Locally, put them in
 `.dev.vars` (gitignored).
+
+Add them with type **Secret**, not "Text". A plain-text variable that is not
+under `[vars]` is deleted by the next git build, and every car page answers
+500 (Monzes Auto, 15 Sep 2026). `keep_vars = true` is the second guard.
 
 Then copy the five files from `examples/site/` into the site and restyle:
 
